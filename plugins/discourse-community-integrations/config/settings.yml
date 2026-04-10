@@ -1,0 +1,61 @@
+plugins:
+  community_integrations_enabled:
+    default: true
+    client: false
+
+  # ── Twitch ──────────────────────────────────────────────────────────────────
+  twitch_client_id:
+    default: ""
+    type: string
+
+  twitch_client_secret:
+    default: ""
+    type: string
+    secret: true
+
+  twitch_broadcaster_id:
+    default: ""
+    type: string
+
+  twitch_subscriber_group:
+    default: "Twitch Subscriber"
+    type: string
+
+  # ── GitHub Sponsors ─────────────────────────────────────────────────────────
+  github_sponsors_target_username:
+    default: "ChrisTitusTech"
+    type: string
+
+  github_sponsors_group:
+    default: "GitHub Sponsors"
+    type: string
+
+  # ── YouTube Members ─────────────────────────────────────────────────────────
+  youtube_client_id:
+    default: ""
+    type: string
+
+  youtube_client_secret:
+    default: ""
+    type: string
+    secret: true
+
+  youtube_channel_id:
+    default: ""
+    type: string
+
+  youtube_creator_refresh_token:
+    default: ""
+    type: string
+    secret: true
+
+  youtube_member_group:
+    default: "YouTube Member"
+    type: string
+
+  # ── Sync schedule ────────────────────────────────────────────────────────────
+  community_integrations_sync_interval_hours:
+    default: 6
+    type: integer
+    min: 1
+    max: 24
