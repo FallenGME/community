@@ -1,0 +1,613 @@
+// =============================================================================
+// Chris Titus Tech — Discourse Theme
+// Mirrors the visual design of christitus.com
+//
+// Design tokens extracted from /home/titus/github/website/:
+//   Primary accent:      #47c4f1  (cyan — links, buttons, active states)
+//   Page background:     #212529  (dark body)
+//   Card background:     #2c3034  (topic list items, post containers)
+//   Input/code bg:       #343a40  (code blocks, inputs)
+//   Border color:        #495057
+//   Body text:           #f8f9fa
+//   Heading text:        #ffffff
+//   Muted text:          #adb5bd  (timestamps, post meta)
+//   Font:                PT Sans 400 / 700 (loaded via Google Fonts — see plugin.rb)
+//   Border radius:       4px
+// =============================================================================
+// PT Sans is injected into <head> via register_html_builder in plugin.rb.
+// Self-hosted woff2 files are available in assets/fonts/ if you prefer to
+// serve them locally (requires a Discourse Theme Component with @font-face).
+
+// ── CSS custom property overrides ─────────────────────────────────────────────
+// These override Discourse's runtime theme variables.
+
+:root {
+  --ctt-accent:        #47c4f1;
+  --ctt-page-bg:       #212529;
+  --ctt-card-bg:       #2c3034;
+  --ctt-input-bg:      #343a40;
+  --ctt-border:        #495057;
+  --ctt-text:          #f8f9fa;
+  --ctt-text-dark:     #ffffff;
+  --ctt-text-muted:    #adb5bd;
+  --ctt-radius:        4px;
+  --ctt-shadow:        rgba(0, 0, 0, 0.25) 0 0.125em 0.5em,
+                       rgba(255, 255, 255, 0.1) 0 0 0 1px inset;
+}
+
+// ── Base typography ───────────────────────────────────────────────────────────
+
+body,
+.d-content,
+.wrap {
+  font-family: 'PT Sans', sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  color: var(--ctt-text);
+  background-color: var(--ctt-page-bg);
+}
+
+p,
+.cooked p {
+  font-family: 'PT Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--ctt-text);
+}
+
+h1, h2, h3, h4, h5, h6,
+.fancy-title,
+.topic-title a,
+.title span {
+  font-family: 'PT Sans', sans-serif;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--ctt-text-dark);
+}
+
+a {
+  color: var(--ctt-text);
+  &:hover {
+    color: var(--ctt-accent);
+    text-decoration: underline;
+  }
+}
+
+::selection {
+  background: rgba(71, 196, 241, 0.35);
+  color: var(--ctt-text-dark);
+}
+
+// ── Page / layout backgrounds ─────────────────────────────────────────────────
+
+html,
+body,
+#main,
+.d-wrap,
+.full-page-search,
+.user-main .about,
+.user-main .staff-counters {
+  background-color: var(--ctt-page-bg);
+}
+
+#main-outlet,
+.regular .topic-post .topic-body,
+.topic-list-item,
+.topic-map,
+.post-stream .topic-post,
+.tag-info,
+#reply-control,
+.d-editor-preview-wrapper,
+.login-modal .modal-inner-container,
+.create-account .modal-inner-container {
+  background-color: var(--ctt-card-bg);
+  border-radius: var(--ctt-radius);
+}
+
+// ── Header ────────────────────────────────────────────────────────────────────
+
+.d-header,
+.site-header {
+  background: var(--ctt-card-bg);
+  border-bottom: 1px solid var(--ctt-border);
+  box-shadow: var(--ctt-shadow);
+
+  .d-header-icons .icon,
+  .d-header-icons .icon svg {
+    color: var(--ctt-text);
+    fill: var(--ctt-text);
+  }
+
+  .d-header-icons .icon:hover,
+  .d-header-icons .icon:hover svg {
+    color: var(--ctt-accent);
+    fill: var(--ctt-accent);
+  }
+
+  .home-logo-wrapper-outlet a,
+  .title a,
+  #site-text-logo {
+    color: var(--ctt-text-dark);
+    font-family: 'PT Sans', sans-serif;
+    font-weight: 700;
+    &:hover { color: var(--ctt-accent); text-decoration: none; }
+  }
+}
+
+// ── Navigation / tabs ─────────────────────────────────────────────────────────
+
+.nav-pills > li > a,
+.nav-pills > li > button,
+.list-controls .combo-box .combo-box-header {
+  color: var(--ctt-text);
+  border-radius: var(--ctt-radius);
+  &:hover { color: var(--ctt-accent); }
+}
+
+.nav-pills > li.active > a,
+.nav-pills > li.active > button {
+  color: #212529;
+  background-color: var(--ctt-accent);
+  border-color: var(--ctt-accent);
+}
+
+// Active nav item underline — mirrors .nav-link active state on christitus.com
+.nav-pills > li > a.active,
+.nav-pills > li > a:focus {
+  color: var(--ctt-accent);
+  background: transparent;
+  border-bottom: 2px solid var(--ctt-accent);
+}
+
+// Category / tag dropdown
+.select-kit .select-kit-header,
+.select-kit .select-kit-row:hover,
+.select-kit .select-kit-row.is-highlighted {
+  background: var(--ctt-input-bg);
+  color: var(--ctt-text);
+  border-color: var(--ctt-border);
+}
+
+.select-kit .select-kit-row.is-selected {
+  background: var(--ctt-accent);
+  color: #212529;
+}
+
+// ── Topic list ────────────────────────────────────────────────────────────────
+
+.topic-list-body,
+.topic-list {
+  background: transparent;
+
+  .topic-list-item {
+    background: var(--ctt-card-bg);
+    border-bottom: 1px solid var(--ctt-border);
+    border-radius: var(--ctt-radius);
+    margin-bottom: 4px;
+
+    &.visited .main-link a.title,
+    &.visited .main-link .topic-statuses .op-likes a {
+      color: var(--ctt-text-muted);
+    }
+
+    &:hover {
+      background: var(--ctt-input-bg);
+    }
+  }
+
+  th {
+    background: var(--ctt-card-bg);
+    color: var(--ctt-text-muted);
+    border-bottom: 1px solid var(--ctt-border);
+  }
+}
+
+.topic-list .topic-list-item a.title:not(.badge-notification) {
+  color: var(--ctt-text);
+  &:hover { color: var(--ctt-accent); text-decoration: none; }
+}
+
+// ── Post / topic body ─────────────────────────────────────────────────────────
+
+.topic-post {
+  .topic-body {
+    background: var(--ctt-card-bg);
+    border-radius: var(--ctt-radius);
+  }
+
+  article.boxed {
+    background: var(--ctt-card-bg);
+    box-shadow: var(--ctt-shadow);
+    border-radius: var(--ctt-radius);
+  }
+}
+
+.names .username a,
+.names .full-name a {
+  color: var(--ctt-text-muted);
+  &:hover { color: var(--ctt-accent); }
+}
+
+.topic-meta-data .post-info a,
+.post-date a,
+.relative-date {
+  color: var(--ctt-text-muted);
+}
+
+// ── Post body (cooked content) ────────────────────────────────────────────────
+
+.cooked {
+  color: var(--ctt-text);
+  font-family: 'PT Sans', sans-serif;
+  font-size: 16px;
+  line-height: 1.7;
+
+  a {
+    color: var(--ctt-accent);
+    &:hover { text-decoration: underline; }
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--ctt-text-dark);
+    font-family: 'PT Sans', sans-serif;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  // Code — dark background matching christitus.com pre/code styling
+  code {
+    padding: 3px 5px;
+    background: var(--ctt-input-bg);
+    border: 1px solid var(--ctt-border);
+    border-radius: 3px;
+    color: var(--ctt-text-dark);
+    font-size: 0.9em;
+  }
+
+  pre {
+    padding: 10px 20px;
+    background: var(--ctt-input-bg);
+    border: 1px solid var(--ctt-border);
+    border-radius: var(--ctt-radius);
+
+    code {
+      border: 0;
+      background: transparent;
+      padding: 0;
+    }
+  }
+
+  // Blockquote — 3px left border in accent color, matches christitus.com
+  blockquote {
+    padding: 20px;
+    background: var(--ctt-input-bg);
+    border-left: 3px solid var(--ctt-accent);
+    border-radius: 0 var(--ctt-radius) var(--ctt-radius) 0;
+    color: var(--ctt-text);
+    font-style: italic;
+
+    p { margin-bottom: 0; }
+  }
+
+  // Tables
+  table {
+    text-align: left;
+    width: 100%;
+    border: 1px solid var(--ctt-border);
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+
+    th, td {
+      padding: .75rem;
+      vertical-align: top;
+      border: 1px solid var(--ctt-border);
+    }
+
+    thead {
+      background: var(--ctt-input-bg);
+      color: var(--ctt-text-dark);
+      font-weight: 700;
+    }
+
+    tbody {
+      background: var(--ctt-card-bg);
+    }
+  }
+
+  // Notice/callout blocks — mirrors christitus.com _main.scss notice colors
+  .notice {
+    &.note,
+    &.info,
+    &.tip,
+    &.warning {
+      margin: 2rem 0;
+      padding: 10px;
+      background: var(--ctt-input-bg);
+    }
+
+    &.note   { border-top: 3px solid #6ab0de; }
+    &.tip    { border-top: 3px solid #78C578; }
+    &.info   { border-top: 3px solid #F0B37E; }
+    &.warning { border-top: 3px solid #E06F6C; }
+  }
+
+  // Unordered list style — gradient bullet from christitus.com
+  ul li {
+    list-style: none;
+    padding-left: 1.25em;
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0.55em;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: linear-gradient(45deg, #9AC4F8, #7e7e7e);
+    }
+  }
+}
+
+// ── Highlight bar (reading progress) ─────────────────────────────────────────
+
+#reading-progress,
+.d-reading-progress {
+  background: var(--ctt-accent);
+  height: 3px;
+}
+
+// ── Buttons ───────────────────────────────────────────────────────────────────
+
+.btn,
+button {
+  font-family: 'PT Sans', sans-serif;
+  border-radius: var(--ctt-radius);
+}
+
+.btn-primary,
+.btn.btn-primary {
+  background: var(--ctt-accent);
+  border-color: var(--ctt-accent);
+  color: #212529;
+  font-weight: 600;
+
+  &:hover, &:focus {
+    background: #2fb8ef;
+    border-color: #2fb8ef;
+    color: #212529;
+  }
+}
+
+.btn-default,
+.btn.btn-default {
+  background: var(--ctt-card-bg);
+  border-color: var(--ctt-border);
+  color: var(--ctt-text);
+
+  &:hover {
+    background: var(--ctt-input-bg);
+    border-color: var(--ctt-accent);
+    color: var(--ctt-accent);
+  }
+}
+
+// ── Badges / tags ─────────────────────────────────────────────────────────────
+
+.badge-category .badge-category-bg {
+  border-radius: var(--ctt-radius);
+}
+
+.discourse-tag a,
+.discourse-tag.simple a {
+  color: var(--ctt-accent);
+  border: 1px solid rgba(71, 196, 241, 0.4);
+  border-radius: var(--ctt-radius);
+  padding: 2px 6px;
+  font-size: 0.85em;
+
+  &:hover {
+    background: rgba(71, 196, 241, 0.15);
+    text-decoration: none;
+  }
+}
+
+// ── Reply editor ──────────────────────────────────────────────────────────────
+
+#reply-control {
+  background: var(--ctt-card-bg);
+  border-top: 3px solid var(--ctt-accent);
+
+  .d-editor-input,
+  .d-editor-textarea-wrapper {
+    background: var(--ctt-input-bg);
+    border-color: var(--ctt-border);
+    color: var(--ctt-text);
+    font-family: 'PT Sans', sans-serif;
+    border-radius: var(--ctt-radius);
+  }
+
+  .d-editor-button-bar button {
+    color: var(--ctt-text-muted);
+    &:hover { color: var(--ctt-accent); }
+  }
+}
+
+// ── Search ────────────────────────────────────────────────────────────────────
+
+.search-container .search-input,
+.search-menu .search-input,
+input[type="text"],
+input[type="email"],
+input[type="search"],
+input[type="password"],
+textarea {
+  background: var(--ctt-input-bg);
+  border-color: var(--ctt-border);
+  color: var(--ctt-text);
+  border-radius: var(--ctt-radius);
+  font-family: 'PT Sans', sans-serif;
+
+  &:focus {
+    border-color: var(--ctt-accent);
+    box-shadow: 0 0 0 2px rgba(71, 196, 241, 0.25);
+    outline: 0;
+  }
+}
+
+// ── Sidebar (Discourse Sidebar feature) ───────────────────────────────────────
+
+.sidebar-wrapper,
+.d-sidebar,
+.sidebar-sections {
+  background: var(--ctt-card-bg);
+  border-right: 1px solid var(--ctt-border);
+}
+
+.sidebar-section-link-wrapper .sidebar-section-link,
+.sidebar-section-link-content-text {
+  color: var(--ctt-text);
+  &:hover { color: var(--ctt-accent); }
+}
+
+.sidebar-section-link-wrapper.active .sidebar-section-link,
+.sidebar-section-link-wrapper.active .sidebar-section-link-content-text {
+  color: var(--ctt-accent);
+  background: rgba(71, 196, 241, 0.1);
+  border-radius: var(--ctt-radius);
+}
+
+.sidebar-section-header-text {
+  color: var(--ctt-text-muted);
+  font-family: 'PT Sans', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.75em;
+}
+
+// ── Widget titles — accent underline (mirrors .widget-title::after) ────────────
+
+.widget-header,
+.topic-map h3,
+.timeline-container h3,
+.suggested-topics h3,
+.more-topics h3 {
+  position: relative;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+  font-family: 'PT Sans', sans-serif;
+  font-weight: 700;
+  color: var(--ctt-text-dark);
+
+  &::after {
+    position: absolute;
+    content: "";
+    height: 1px;
+    width: 100%;
+    background-color: var(--ctt-accent);
+    bottom: 0;
+    left: 0;
+  }
+}
+
+// ── Topic map / summary ───────────────────────────────────────────────────────
+
+.topic-map {
+  background: var(--ctt-card-bg);
+  border: 1px solid var(--ctt-border);
+  border-radius: var(--ctt-radius);
+}
+
+.topic-map .map,
+.topic-map .map .buttons {
+  background: transparent;
+}
+
+// ── Dropdown menus ────────────────────────────────────────────────────────────
+
+.dropdown-menu,
+.menu-panel,
+.d-menu-panel {
+  background: var(--ctt-card-bg);
+  border: 1px solid var(--ctt-border);
+  border-top: 3px solid var(--ctt-accent);
+  border-radius: var(--ctt-radius);
+  box-shadow: var(--ctt-shadow);
+}
+
+.dropdown-menu li a,
+.menu-panel li a,
+.widget-dropdown-item a {
+  color: var(--ctt-text);
+  &:hover {
+    color: var(--ctt-accent);
+    background: rgba(71, 196, 241, 0.08);
+    text-decoration: none;
+  }
+}
+
+// ── Footer ────────────────────────────────────────────────────────────────────
+
+footer,
+#footer-nav {
+  background: var(--ctt-card-bg);
+  border-top: 1px solid var(--ctt-border);
+  color: var(--ctt-text-muted);
+
+  a {
+    color: var(--ctt-text-muted);
+    &:hover { color: var(--ctt-accent); }
+  }
+}
+
+// ── Social / share icons ──────────────────────────────────────────────────────
+
+.share-links a,
+.post-actions a,
+.discourse-reactions-picker .reaction-btn.active svg {
+  color: var(--ctt-accent);
+}
+
+.btn.share-link,
+.btn.reply {
+  color: var(--ctt-text-muted);
+  &:hover { color: var(--ctt-accent); }
+}
+
+// ── Notification badges ───────────────────────────────────────────────────────
+
+.badge-notification,
+.unread-posts {
+  background: var(--ctt-accent);
+  color: #212529;
+}
+
+// ── User profile ──────────────────────────────────────────────────────────────
+
+.user-main {
+  background: var(--ctt-page-bg);
+
+  .primary,
+  .secondary {
+    background: var(--ctt-card-bg);
+    border: 1px solid var(--ctt-border);
+    border-radius: var(--ctt-radius);
+  }
+}
+
+.user-card {
+  background: var(--ctt-card-bg);
+  border: 1px solid var(--ctt-border);
+  border-radius: var(--ctt-radius);
+  box-shadow: var(--ctt-shadow);
+}
+
+// ── Shadow utility ────────────────────────────────────────────────────────────
+
+.shadow,
+.cooked .shadow {
+  box-shadow: var(--ctt-shadow) !important;
+}

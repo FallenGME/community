@@ -1,223 +1,228 @@
-# ChrisTitusTech Community Forum
+# discourse-community-integrations
 
-Self-hosted Discourse forum with automated group membership sync for:
-- **GitHub Sponsors** — via GitHub OAuth + GraphQL API
-- **Twitch Subscribers** — via Twitch OAuth + Helix API
-- **Patreon Members** — via the bundled `discourse-patreon` plugin
-- **YouTube Members** — via Google OAuth (user connects account) + YouTube Data API v3
+Discourse plugin for the ChrisTitusTech community forum. Bundles:
+
+- **GitHub Sponsors** — syncs sponsoring users to a Discourse group via GitHub OAuth + GraphQL
+- **Twitch Subscribers** — syncs subscribers via Twitch OAuth + Helix API
+- **YouTube Members** — syncs channel members via Google OAuth + YouTube Data API v3
+- **Chris Titus Tech dark theme** — mirrors the design of [christitus.com](https://christitus.com) (PT Sans, `#47c4f1` accent, dark `#212529` background)
+
+---
+
+## Installation
+
+Discourse must already be running. Add the plugin by editing your `containers/app.yml`:
+
+```yaml
+hooks:
+  after_code:
+    - exec:
+        cd: $home/plugins
+        cmd:
+          - git clone https://github.com/discourse/docker_manager.git
+          - git clone https://github.com/ChrisTitusTech/community.git discourse-community-integrations
+```
+
+> **The clone target name `discourse-community-integrations` is required.** Font asset paths in the theme CSS use this directory name.
+
+Then rebuild:
+
+```bash
+cd /var/discourse
+./launcher rebuild app
+```
+
+After the rebuild, activate the theme in **Admin → Customize → Colors → Chris Titus Tech → Set as Default**.
 
 ---
 
 ## Repository Layout
 
 ```
-community/                          ← this repo (clone to /var/discourse)
-├── containers/
-│   └── app.yml                     ← Discourse Docker configuration
-├── scripts/
-│   └── setup.sh                    ← one-time VPS preparation script
-└── plugins/
-    └── discourse-community-integrations/   ← custom Discourse plugin
-        ├── plugin.rb
-        ├── config/settings.yml
-        ├── app/lib/
-        │   ├── auth/               ← OAuth authenticators
-        │   └── community_integrations/  ← membership checker modules
-        └── jobs/                   ← background + scheduled jobs
+plugin.rb                           ← Discourse plugin entrypoint
+app/lib/
+│   auth/
+│   │   twitch_strategy.rb          ← OmniAuth OAuth2 strategy for Twitch
+│   │   twitch_authenticator.rb     ← Discourse authenticator wrapper
+│   │   youtube_authenticator.rb    ← Google OAuth connect-only (YouTube scope)
+│   └── community_integrations/
+│       group_sync.rb               ← Shared add/remove helper
+│       twitch_checker.rb           ← Helix subscriber API
+│       github_sponsors_checker.rb  ← GitHub GraphQL sponsorship check
+│       youtube_member_checker.rb   ← YouTube memberships API (two-token)
+config/
+│   settings.yml                    ← Plugin site settings
+│   locales/server.en.yml           ← Admin UI label strings
+jobs/
+│   regular/                        ← Async jobs triggered on login
+│   └── scheduled/                  ← Periodic full re-sync (every 6 h)
+assets/
+│   fonts/                          ← PT Sans woff2 (reference; font loaded via Google Fonts)
+│   stylesheets/
+│       common/ctt-theme.scss       ← Dark theme — full color + typography
+│       desktop/ctt-desktop.scss    ← Desktop-specific overrides
+│       └── mobile/ctt-mobile.scss  ← Mobile-specific overrides
+deploy/
+│   app.yml                         ← Full Discourse Docker config (reference)
+scripts/
+    setup.sh                        ← One-time Ubuntu 22.04 VPS prep
+    get_youtube_creator_token.py    ← Get the YouTube creator refresh token
 ```
 
-> **Note:** For Docker deployment the plugin must be published as a standalone repository.
-> See [Publishing the Plugin](#publishing-the-plugin) below.
+---
+
+## Configuration
+
+All settings are under **Admin → Settings → Plugins → Community Integrations**.
+
+| Setting | Description |
+|---------|-------------|
+| `community_integrations_enabled` | Master switch |
+| `twitch_client_id` / `twitch_client_secret` | Twitch OAuth app credentials |
+| `twitch_broadcaster_id` | Numeric channel ID (not username) |
+| `twitch_subscriber_group` | Discourse group name for subscribers (default: `Twitch Subscriber`) |
+| `github_sponsors_target_username` | GitHub username to check sponsorship of (default: `ChrisTitusTech`) |
+| `github_sponsors_group` | Discourse group for sponsors (default: `GitHub Sponsors`) |
+| `youtube_client_id` / `youtube_client_secret` | Google OAuth app credentials |
+| `youtube_channel_id` | Creator's YouTube channel ID |
+| `youtube_creator_refresh_token` | Creator token with `channel-memberships.creator` scope |
+| `youtube_member_group` | Discourse group for members (default: `YouTube Member`) |
+| `community_integrations_sync_interval_hours` | Re-sync interval in hours (1–24, default: 6) |
 
 ---
 
-## Server Requirements
+## OAuth App Setup
 
-| Resource | Minimum | Recommended |
-|----------|---------|-------------|
-| CPU      | 2 vCPU  | 6 vCPU (your config) |
-| RAM      | 2 GB    | 6 GB (your config) |
-| Disk     | 20 GB   | 350 GB SSD (your config) |
-| OS       | Ubuntu 22.04 LTS |  |
-| Docker   | 24.0+   |  |
-| Ports    | 22, 80, 443 open |  |
+### Callback URL Reference
+
+> **Error 400: redirect_uri_mismatch** means the URL registered in the developer console does not exactly match what Discourse sends. Copy these URLs character-for-character — wrong path, wrong scheme (`http` vs `https`), or a missing trailing segment will cause this error.
+>
+> Also ensure `DISCOURSE_HOSTNAME` in your `deploy/app.yml` is set to the exact domain users access. Discourse uses that value to construct callback URLs.
+
+| Provider | Callback URL to enter in developer console |
+|----------|--------------------------------------------|
+| GitHub | `https://YOUR_DOMAIN/auth/github/callback` |
+| Google (login) | `https://YOUR_DOMAIN/auth/google_oauth2/callback` |
+| YouTube (connect; our plugin) | `https://YOUR_DOMAIN/auth/youtube/callback` |
+| Twitch (our plugin) | `https://YOUR_DOMAIN/auth/twitch/callback` |
+| Patreon | `https://YOUR_DOMAIN/auth/patreon/callback` |
+
+Common mistakes:
+- Google path is `/auth/google_oauth2/callback` — the `_oauth2` suffix and trailing `/callback` are both required
+- Patreon path is `/auth/patreon/callback` — not `/auth/patreon-oauth2/callback`
+- All URLs must use `https://` — Discourse rejects `http` OAuth flows
+- GitHub only accepts **one** callback URL per app; it must match exactly (no trailing slash)
 
 ---
 
-## Phase 1: VPS Preparation
+### GitHub
 
-SSH into the VPS as root, then run the setup script:
+1. <https://github.com/settings/developers> → **OAuth Apps** → **New OAuth App**
+2. **Authorization callback URL**: `https://YOUR_DOMAIN/auth/github/callback`
+3. Enter Client ID + Secret in **Admin → Settings → Login → GitHub** and enable `enable github logins`
+
+GitHub OAuth is standard Discourse — no custom settings needed. The plugin checks sponsorship automatically on each GitHub login.
+
+### Patreon
+
+1. <https://www.patreon.com/portal/registration/register-clients> → **Create Client**
+2. **Redirect URIs**: `https://YOUR_DOMAIN/auth/patreon/callback`
+3. Enable the Patreon plugin in **Admin → Plugins → Patreon** and enter Client ID + Secret
+4. Log in to the forum **as the creator's Patreon account** once — the plugin captures the creator token on that login
+5. In **Admin → Plugins → Patreon**, map your reward tiers to the `Patron` Discourse group
+
+### Twitch
+
+1. <https://dev.twitch.tv/console> → **Register Your Application**
+2. **OAuth Redirect URL**: `https://YOUR_DOMAIN/auth/twitch/callback`
+3. Category: **Website Integration**
+4. Enter Client ID, Secret, and your numeric **Broadcaster ID** in **Admin → Settings → Plugins → Community Integrations**
+
+Find your numeric broadcaster ID (it is *not* your username):
+- API: `https://api.twitch.tv/helix/users?login=YOUR_USERNAME` (requires a bearer token)
+- Or use: <https://www.streamweasels.com/tools/convert-twitch-username-to-user-id/>
+
+### YouTube + Google Login
+
+YouTube membership verification uses two tokens and **one** Google OAuth app for both standard Google login and the YouTube connect flow.
+
+| Token | Who | Scope | Purpose |
+|-------|-----|-------|---------|
+| Creator token | Channel owner | `youtube.channel-memberships.creator` | Query the member list |
+| User token | Each forum member | `youtube.readonly` | Resolve their channel ID |
+
+**Step 1 — Create a Google OAuth app**
+
+1. <https://console.cloud.google.com> → new project → enable **YouTube Data API v3**
+2. **APIs & Services → Credentials → Create OAuth Client ID** → Web Application
+3. **Authorized JavaScript origins** (required by Google — base domain only, no path):
+   - `https://YOUR_DOMAIN`
+4. **Authorized redirect URIs** (both required):
+   - `https://YOUR_DOMAIN/auth/google_oauth2/callback`
+   - `https://YOUR_DOMAIN/auth/youtube/callback`
+5. Copy the Client ID and Client Secret
+
+**Step 2 — Get the creator refresh token (one-time)**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/ChrisTitusTech/community/main/scripts/setup.sh | bash
+pip install google-auth-oauthlib
+python3 scripts/get_youtube_creator_token.py
 ```
 
-This installs Docker, configures UFW, creates the `discourse` system user, and clones `discourse_docker`.
+Paste the printed refresh token into plugin settings.
+
+**Step 3 — Configure in Discourse**
+
+- **Admin → Settings → Login → Google** — enter Client ID and Secret; enable `enable google oauth2 logins`
+- **Admin → Settings → Plugins → Community Integrations** — enter YouTube Client ID, Secret, Channel ID, Creator Refresh Token
 
 ---
 
-## Phase 2: DNS & Email
+## Discourse Groups
 
-1. **DNS** — Add an A record pointing your forum domain to the VPS IP. Wait for propagation before bootstrapping (Let's Encrypt requires port 80 to be reachable).
+Create these groups in **Admin → Groups** before enabling integrations (names must match plugin settings exactly, or update the settings to match):
 
-2. **SMTP** — Discourse requires transactional email for signups and notifications. Recommended providers:
-   - [Mailgun](https://mailgun.com) — free tier 1,000 emails/month
-   - [Postmark](https://postmarkapp.com) — free tier 100/month
-   - [SendGrid](https://sendgrid.com) — free tier 100/day
-
----
-
-## Phase 3: Configure `app.yml`
-
-```bash
-cp /var/discourse/containers/app.yml.sample /var/discourse/containers/app.yml
-# or copy from this repo:
-cp /path/to/community/containers/app.yml /var/discourse/containers/app.yml
-```
-
-Edit all `REPLACE_WITH_*` placeholders in `containers/app.yml`.
-
----
-
-## Phase 4: Bootstrap & Launch
-
-```bash
-cd /var/discourse
-./launcher bootstrap app   # ~5–10 minutes; downloads images, compiles assets
-./launcher start app       # starts the forum
-```
-
-Visit your domain — the setup wizard runs on first load.
-
----
-
-## Phase 5: Create Discourse Groups
-
-In **Admin → Groups**, create these four groups exactly as named (or update the plugin settings to match your choice):
-
-| Group Name | Platform |
-|------------|----------|
+| Group | Platform |
+|-------|----------|
 | `GitHub Sponsors` | GitHub |
 | `Twitch Subscriber` | Twitch |
-| `Patron` | Patreon |
 | `YouTube Member` | YouTube |
 
 ---
 
-## Phase 6: OAuth App Setup
-
-### GitHub (Sponsors)
-
-1. Go to <https://github.com/settings/developers> → **OAuth Apps** → **New OAuth App**
-2. Set **Authorization callback URL** to `https://YOUR_DOMAIN/auth/github/callback`
-3. Copy the **Client ID** and **Client Secret** into Discourse:
-   **Admin → Settings → Login → GitHub**
-
-### Twitch (Subscribers)
-
-1. Go to <https://dev.twitch.tv/console> → **Register Your Application**
-2. Set **OAuth Redirect URL** to `https://YOUR_DOMAIN/auth/twitch/callback`
-3. Choose **Category: Website Integration**
-4. Copy **Client ID** and **Client Secret** into:
-   **Admin → Settings → Plugins → Community Integrations**
-5. Set **Twitch Broadcaster ID** — find your numeric channel ID at
-   `https://api.twitch.tv/helix/users?login=YOUR_USERNAME` (use a test token) or via <https://www.streamweasels.com/tools/convert-twitch-username-to-user-id/>
-
-### Patreon
-
-1. Go to <https://www.patreon.com/portal/registration/register-clients>
-2. Set **Redirect URI** to `https://YOUR_DOMAIN/auth/patreon/callback`
-3. Configure in **Admin → Settings → Plugins → Patreon**
-4. Log in as the creator account once to capture the creator OAuth token
-5. Map reward tiers to the **Patron** group in the Patreon plugin settings
-
-### YouTube (Members)
-
-YouTube Membership verification uses a **two-token approach**:
-
-| Token | Who | Scope | Purpose |
-|-------|-----|-------|---------|
-| **Creator token** | Chris (channel owner) | `youtube.channel-memberships.creator` | Query the member list |
-| **User token** | Each forum member | `youtube.readonly` | Retrieve their YouTube channel ID |
-
-#### A. Create the Google OAuth App
-
-1. Go to <https://console.cloud.google.com> → create a new project (e.g. `community-forum`)
-2. Enable: **YouTube Data API v3** and **Google+ API** (for profile)
-3. Under **APIs & Services → Credentials** → **Create OAuth 2.0 Client ID** (Web Application)
-4. Add **Authorized redirect URIs**:
-   - `https://YOUR_DOMAIN/auth/google_oauth2/callback` (regular Google login)
-   - `https://YOUR_DOMAIN/auth/youtube/callback` (YouTube connect flow)
-5. Copy **Client ID** and **Client Secret**
-
-#### B. Get the Creator Refresh Token (one-time setup)
-
-Run this locally to get Chris's channel-memberships refresh token:
+## Verify & Debug
 
 ```bash
-# Install google-auth-oauthlib if needed: pip install google-auth-oauthlib
-python3 scripts/get_youtube_creator_token.py
-```
-
-This outputs a refresh token — paste it into:
-**Admin → Settings → Plugins → Community Integrations → YouTube Creator Refresh Token**
-
-#### C. Configure in Discourse
-
-- **Admin → Settings → Login → Google** — enter the Client ID and Secret from step A
-- **Admin → Settings → Plugins → Community Integrations** — enter YouTube Client ID, Secret, Creator Refresh Token, and Channel ID
-
----
-
-## Phase 7: Verify Integrations
-
-```bash
-# Check Discourse logs for any auth or sync errors
+# Tail Discourse logs for sync activity
 sudo /var/discourse/launcher logs app | grep -E "(TwitchChecker|GithubSponsor|YoutubeMember|ERROR)"
 
-# Manually trigger the full sync job from the Rails console
+# Manually trigger a full re-sync
 sudo /var/discourse/launcher enter app
 rails r "Jobs::SyncCommunityIntegrations.new.execute({})"
 ```
 
-In **Admin → Groups**, confirm the member counts reflect active sponsors/subscribers/members.
-
 ---
 
-## Publishing the Plugin
-
-The `plugins/discourse-community-integrations/` directory must be pushed as its own repository so Discourse's Docker setup can `git clone` it during bootstrap.
-
-```bash
-cd plugins/discourse-community-integrations
-git init
-git remote add origin https://github.com/ChrisTitusTech/discourse-community-integrations.git
-git add .
-git commit -m "Initial plugin scaffold"
-git push -u origin main
-```
-
-After publishing, `containers/app.yml` already references the correct URL.
-
----
-
-## Updating Discourse
+## Updating
 
 ```bash
 cd /var/discourse
-git pull
-./launcher rebuild app   # rebuilds with latest Discourse + plugins
+./launcher rebuild app
 ```
+
+This pulls the latest plugin code and rebuilds the container.
 
 ---
 
-## Troubleshooting
+## New Server Setup
 
-| Symptom | Fix |
-|---------|-----|
-| Let's Encrypt fails | Ensure DNS is pointing to VPS and port 80 is open |
-| Emails not sending | Check SMTP credentials; run `rails r "UserNotifications.test_email('you@example.com')"` |
-| Twitch group not assigned | Confirm `twitch_broadcaster_id` is a numeric ID, not a username |
-| GitHub group not assigned | Ensure the user's GitHub OAuth token has not expired (GitHub tokens rarely expire unless revoked) |
-| YouTube check fails with 403 | Re-run `get_youtube_creator_token.py` — the creator refresh token may have been revoked |
-| YouTube API quota exceeded | Default is 10,000 units/day; request an increase in GCP Console or reduce sync frequency |
+If you're setting up the VPS from scratch:
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/ChrisTitusTech/community/main/scripts/setup.sh)
+```
+
+This installs Docker, configures UFW (ports 22/80/443), adds a 2 GB swapfile, and clones `discourse_docker`. After it completes, copy `deploy/app.yml` to `/var/discourse/containers/app.yml`, fill in the `REPLACE_WITH_*` placeholders, then bootstrap.
+
+
+---

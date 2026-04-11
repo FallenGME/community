@@ -81,14 +81,51 @@ hooks:
     - exec:
         cd: $home/plugins
         cmd:
-          ## Required: Discourse Docker manager (do not remove)
+          ## ── REQUIRED — do not remove ──────────────────────────────────────
           - git clone https://github.com/discourse/docker_manager.git
 
-          ## ChrisTitusTech community integrations plugin
-          ## (GitHub Sponsors, Twitch Subscribers, YouTube Members)
-          ## Publish the contents of plugins/discourse-community-integrations/
-          ## to this repo before bootstrapping. See README.md for instructions.
-          - git clone https://github.com/ChrisTitusTech/discourse-community-integrations.git
+          ## ── CUSTOM PLUGIN ─────────────────────────────────────────────────
+          ## Contains: Twitch OAuth, GitHub Sponsors checker, YouTube Members
+          ## checker, and the Chris Titus Tech dark theme.
+          ## Clone target name must be discourse-community-integrations so font
+          ## asset paths resolve correctly.
+          - git clone https://github.com/ChrisTitusTech/community.git discourse-community-integrations
 
-          ## discourse-patreon is bundled with Discourse — it does not need
-          ## a separate git clone. Enable it in Admin → Plugins after launch.
+          ## ── BUNDLED PLUGINS — DO NOT ADD GIT CLONE LINES FOR THESE ───────
+          ##
+          ## As of Discourse 3.4+ (mid-2025), the following popular plugins are
+          ## shipped with Discourse core. Adding a git clone for any of them
+          ## causes the bootstrap to FAIL with:
+          ##   "HINT: The plugin '…' is now bundled with Discourse"
+          ## Reference: https://meta.discourse.org/t/373574
+          ##
+          ## All bundled plugins are DISABLED by default. Enable them after
+          ## launch in Admin → Settings (search the plugin name).
+          ## See README.md § Phase 5 for the full enable checklist.
+          ##
+          ## Integration (required for this forum):
+          ##   discourse-patreon       → Admin → Plugins → Patreon
+          ##   discourse-github        → Admin → Settings → Login → GitHub
+          ##   discourse-oauth2-basic  → (used by custom plugin; no action needed)
+          ##
+          ## Community features (recommended):
+          ##   chat                    → Admin → Settings → Chat
+          ##   discourse-reactions     → Admin → Settings → Plugins → Reactions
+          ##   discourse-solved        → Admin → Settings → Plugins → Solved
+          ##   discourse-topic-voting  → Admin → Settings → Plugins → Topic Voting
+          ##   discourse-calendar      → Admin → Settings → Plugins → Calendar
+          ##   discourse-gamification  → Admin → Settings → Plugins → Gamification
+          ##   poll                    → Admin → Settings → Plugins → Poll
+          ##   spoiler-alert           → Admin → Settings → Plugins → Spoiler Alert
+          ##   checklist               → Admin → Settings → Plugins → Checklist
+          ##   discourse-local-dates   → Admin → Settings → Plugins → Local Dates
+          ##   automation              → Admin → Settings → Plugins → Automation
+          ##
+          ## Moderation / admin (recommended):
+          ##   discourse-assign        → Admin → Settings → Plugins → Assign
+          ##   discourse-data-explorer → Admin → Settings → Plugins → Data Explorer
+          ##   discourse-user-notes    → Admin → Settings → Plugins → User Notes
+          ##
+          ## Optional:
+          ##   discourse-ai            → Admin → Settings → Plugins → Discourse AI
+          ##   discourse-cakeday       → Admin → Settings → Plugins → Cakeday

@@ -1,0 +1,100 @@
+// =============================================================================
+// Chris Titus Tech — Mobile overrides
+// Applied only on mobile viewports (Discourse loads this for mobile only)
+// =============================================================================
+
+// ── Compact sticky header ─────────────────────────────────────────────────────
+
+.d-header {
+  padding: 8px 12px;
+
+  .title a,
+  #site-text-logo {
+    font-size: 16px;
+  }
+
+  .header-buttons {
+    gap: 4px;
+  }
+}
+
+// ── Topic list items ──────────────────────────────────────────────────────────
+
+.topic-list-body .topic-list-item {
+  padding: 10px 12px;
+
+  .link-top-line {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ctt-text);
+  }
+
+  .link-bottom-line {
+    font-size: 12px;
+    color: var(--ctt-text-muted);
+  }
+}
+
+// ── Post body ─────────────────────────────────────────────────────────────────
+
+.topic-post article.boxed {
+  padding: 15px 12px;
+}
+
+.cooked {
+  font-size: 15px;
+
+  pre {
+    overflow-x: auto;
+    font-size: 13px;
+    padding: 10px 12px;
+  }
+
+  blockquote {
+    padding: 12px;
+  }
+
+  table {
+    font-size: 13px;
+    display: block;
+    overflow-x: auto;
+  }
+}
+
+// ── Reply editor ──────────────────────────────────────────────────────────────
+
+#reply-control {
+  .d-editor-input {
+    min-height: 120px;
+    font-size: 15px;
+  }
+}
+
+// ── Full-screen search on mobile ──────────────────────────────────────────────
+
+.search-container {
+  background: var(--ctt-card-bg);
+  padding: 12px;
+
+  .search-input {
+    font-size: 16px; // prevent iOS zoom on focus
+  }
+}
+
+// ── Category cards stacked on mobile ─────────────────────────────────────────
+
+.category-box {
+  padding: 15px 12px;
+}
+
+// ── Bottom nav bar (Discourse mobile) ────────────────────────────────────────
+
+.mobile-nav {
+  background: var(--ctt-card-bg);
+  border-top: 1px solid var(--ctt-border);
+
+  a, button {
+    color: var(--ctt-text-muted);
+    &.active, &:hover { color: var(--ctt-accent); }
+  }
+}

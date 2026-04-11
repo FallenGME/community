@@ -1,0 +1,107 @@
+// =============================================================================
+// Chris Titus Tech — Desktop overrides
+// Applied only on desktop viewports (Discourse loads this for desktop only)
+// =============================================================================
+
+// ── Header desktop spacing ────────────────────────────────────────────────────
+
+.d-header .header-contents {
+  padding: 0 16px;
+}
+
+.d-header .d-header-icons {
+  gap: 4px;
+}
+
+// ── Sidebar desktop ───────────────────────────────────────────────────────────
+
+.sidebar-wrapper {
+  min-height: calc(100vh - 60px);
+  background: var(--ctt-card-bg);
+  border-right: 1px solid var(--ctt-border);
+}
+
+// ── Topic list desktop card layout ───────────────────────────────────────────
+
+.topic-list-body .topic-list-item {
+  padding: 12px 16px;
+  transition: background 0.15s ease;
+
+  .link-top-line {
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .link-bottom-line {
+    font-size: 13px;
+    color: var(--ctt-text-muted);
+  }
+}
+
+// Category box — consistent with christitus.com card-block
+.category-box {
+  background: var(--ctt-card-bg);
+  border: 1px solid var(--ctt-border);
+  border-radius: var(--ctt-radius);
+  box-shadow: var(--ctt-shadow);
+  padding: 20px 30px;
+
+  h3 {
+    color: var(--ctt-text-dark);
+    font-family: 'PT Sans', sans-serif;
+    font-weight: 700;
+  }
+
+  .category-description {
+    color: var(--ctt-text-muted);
+    font-size: 14px;
+  }
+}
+
+// ── Post article — .block equivalent (christitus.com uses 40px padding) ───────
+
+.topic-post article.boxed {
+  padding: 40px;
+}
+
+// ── Right rail ────────────────────────────────────────────────────────────────
+
+.topic-timeline .timeline-container {
+  background: transparent;
+
+  .btn-toggle-timelines {
+    color: var(--ctt-text-muted);
+    &:hover { color: var(--ctt-accent); }
+  }
+
+  .timeline-scrollarea-wrapper {
+    border-left: 2px solid var(--ctt-border);
+  }
+
+  .timeline-handle {
+    background: var(--ctt-accent);
+  }
+}
+
+// ── Suggested topics section ──────────────────────────────────────────────────
+
+.suggested-topics {
+  background: var(--ctt-card-bg);
+  border-radius: var(--ctt-radius);
+  padding: 20px 30px;
+  margin-top: 24px;
+  box-shadow: var(--ctt-shadow);
+}
+
+// ── Admin panels ──────────────────────────────────────────────────────────────
+
+.admin-container,
+.admin-detail {
+  background: var(--ctt-page-bg);
+
+  .admin-area {
+    background: var(--ctt-card-bg);
+    border-radius: var(--ctt-radius);
+    padding: 20px 30px;
+  }
+}
