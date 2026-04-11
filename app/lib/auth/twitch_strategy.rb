@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "omniauth-oauth2"
-
 module OmniAuth
   module Strategies
     # Lightweight Twitch OAuth2 strategy built on top of omniauth-oauth2
