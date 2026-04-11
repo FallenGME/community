@@ -18,10 +18,33 @@ templates:
   - "templates/web.template.yml"
   - "templates/web.ratelimited.template.yml"
 
-## Expose HTTP and HTTPS to the host
+## ── Expose ────────────────────────────────────────────────────────────────
+## CHOOSE ONE of the two options below based on your setup:
+##
+## Option A — Discourse handles its own SSL (no reverse proxy, no Caddy):
+##   Uncomment the 80/443 lines, comment out 8080.
+##   Discourse uses its built-in nginx + Let's Encrypt.
+##
+## Option B — Caddy (or another reverse proxy) terminates SSL on the host:
+##   Keep only 8080:80 exposed. Caddy proxies to localhost:8080.
+##   Required Caddy site config:
+##
+##     reverse_proxy localhost:8080 {
+##       header_up X-Forwarded-Proto https
+##       header_up X-Real-IP {remote_host}
+##     }
+##
+##   DISCOURSE_FORCE_HTTPS: true is safe with Caddy — Caddy sends
+##   X-Forwarded-Proto: https and Rails honours it (no redirect loop).
+##   Discourse will correctly generate https:// OAuth callback URLs.
+##
 expose:
-  - "80:80"
-  - "443:443"
+  ## Option A (Discourse owns SSL):
+  # - "80:80"
+  # - "443:443"
+
+  ## Option B (Caddy reverse proxy):
+  - "8080:80"
 
 params:
   db_default_text_search_config: "pg_catalog.english"
