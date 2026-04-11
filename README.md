@@ -95,9 +95,11 @@ All settings are under **Admin → Settings → Plugins → Community Integratio
 
 ### Callback URL Reference
 
-> **Error 400: redirect_uri_mismatch** means the URL registered in the developer console does not exactly match what Discourse sends. Copy these URLs character-for-character — wrong path, wrong scheme (`http` vs `https`), or a missing trailing segment will cause this error.
+> **Error 400 / `invalid_request: Redirect URI http://… is not supported`** — Discourse is generating `http://` callback URLs instead of `https://`. The fix is to add `DISCOURSE_FORCE_HTTPS: true` to your `deploy/app.yml` (it is already present in the `deploy/app.yml` in this repo). Without it, Discourse constructs callback URLs with `http://` even when the site is served over TLS, and every OAuth provider will reject them.
 >
-> Also ensure `DISCOURSE_HOSTNAME` in your `deploy/app.yml` is set to the exact domain users access. Discourse uses that value to construct callback URLs.
+> After adding the setting, run `./launcher rebuild app` to apply it.
+>
+> Other causes of redirect URI errors: wrong path (copy character-for-character from the table below), mismatched domain in `DISCOURSE_HOSTNAME`, or a trailing slash where none is expected.
 
 | Provider | Callback URL to enter in developer console |
 |----------|--------------------------------------------|

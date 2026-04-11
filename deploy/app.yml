@@ -42,6 +42,11 @@ env:
   ## The public hostname for your forum. Must match your DNS A record.
   DISCOURSE_HOSTNAME: 'REPLACE_WITH_YOUR_DOMAIN'   # e.g. community.christitus.com
 
+  ## Force Discourse to generate https:// URLs in OAuth callbacks.
+  ## Without this, OAuth providers see http:// redirect URIs and reject them
+  ## with "Error 400: redirect_uri_mismatch" or "invalid_request".
+  DISCOURSE_FORCE_HTTPS: true
+
   ## Email address that receives admin-level notifications (space-separated)
   DISCOURSE_DEVELOPER_EMAILS: 'REPLACE_WITH_ADMIN_EMAIL'
 
