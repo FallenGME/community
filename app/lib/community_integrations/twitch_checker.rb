@@ -23,8 +23,8 @@ module CommunityIntegrations
     # Entry point — call this from a job or the scheduled sync.
     def self.sync_user(user)
       return unless SiteSetting.community_integrations_enabled
-      return unless SiteSetting.twitch_broadcaster_id.present?
-      return unless SiteSetting.twitch_client_id.present?
+      return unless SiteSetting.community_integrations_twitch_broadcaster_id.present?
+      return unless SiteSetting.community_integrations_twitch_client_id.present?
 
       associated =
         UserAssociatedAccount.find_by(user_id: user.id, provider_name: "twitch")
@@ -41,7 +41,7 @@ module CommunityIntegrations
           nil
         end
 
-      GroupSync.sync(user, SiteSetting.twitch_subscriber_group, subscribed)
+      GroupSync.sync(user, SiteSetting.community_integrations_twitch_subscriber_group, subscribed)
     end
 
     # ── Private helpers ────────────────────────────────────────────────────────
@@ -51,11 +51,11 @@ module CommunityIntegrations
         Faraday.get(
           TWITCH_SUBSCRIPTIONS_URL,
           {
-            broadcaster_id: SiteSetting.twitch_broadcaster_id,
+            broadcaster_id: SiteSetting.community_integrations_twitch_broadcaster_id,
             user_id: twitch_user_id,
           },
           {
-            "Client-ID" => SiteSetting.twitch_client_id,
+            "Client-ID" => SiteSetting.community_integrations_twitch_client_id,
             "Authorization" => "Bearer #{token}",
           },
         )
@@ -95,8 +95,8 @@ module CommunityIntegrations
             URI.encode_www_form(
               grant_type: "refresh_token",
               refresh_token: refresh_token,
-              client_id: SiteSetting.twitch_client_id,
-              client_secret: SiteSetting.twitch_client_secret,
+              client_id: SiteSetting.community_integrations_twitch_client_id,
+              client_secret: SiteSetting.community_integrations_twitch_client_secret,
             )
         end
 

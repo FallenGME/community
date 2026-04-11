@@ -13,7 +13,7 @@ class Auth::TwitchAuthenticator < Auth::ManagedAuthenticator
   end
 
   def enabled?
-    SiteSetting.community_integrations_enabled && SiteSetting.twitch_client_id.present?
+    SiteSetting.community_integrations_enabled && SiteSetting.community_integrations_twitch_client_id.present?
   end
 
   # Show Twitch as a login option on the login modal.
@@ -22,12 +22,12 @@ class Auth::TwitchAuthenticator < Auth::ManagedAuthenticator
   end
 
   def register_middleware(omniauth)
-    omniauth.provider :twitch,
+    omniauth.provider OmniAuth::Strategies::Twitch,
                       setup:
                         lambda { |env|
                           opts = env["omniauth.strategy"].options
-                          opts[:client_id] = SiteSetting.twitch_client_id
-                          opts[:client_secret] = SiteSetting.twitch_client_secret
+                          opts[:client_id] = SiteSetting.community_integrations_twitch_client_id
+                          opts[:client_secret] = SiteSetting.community_integrations_twitch_client_secret
                         }
   end
 

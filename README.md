@@ -73,20 +73,20 @@ scripts/
 
 ## Configuration
 
-All settings are under **Admin → Settings → Plugins → Community Integrations**.
+All settings are under **Admin → Settings** (search `community_integrations`) or via **Admin → Plugins → discourse-community-integrations → Settings**.
 
 | Setting | Description |
 |---------|-------------|
 | `community_integrations_enabled` | Master switch |
-| `twitch_client_id` / `twitch_client_secret` | Twitch OAuth app credentials |
-| `twitch_broadcaster_id` | Numeric channel ID (not username) |
-| `twitch_subscriber_group` | Discourse group name for subscribers (default: `Twitch Subscriber`) |
-| `github_sponsors_target_username` | GitHub username to check sponsorship of (default: `ChrisTitusTech`) |
-| `github_sponsors_group` | Discourse group for sponsors (default: `GitHub Sponsors`) |
-| `youtube_client_id` / `youtube_client_secret` | Google OAuth app credentials |
-| `youtube_channel_id` | Creator's YouTube channel ID |
-| `youtube_creator_refresh_token` | Creator token with `channel-memberships.creator` scope |
-| `youtube_member_group` | Discourse group for members (default: `YouTube Member`) |
+| `community_integrations_twitch_client_id` / `community_integrations_twitch_client_secret` | Twitch OAuth app credentials |
+| `community_integrations_twitch_broadcaster_id` | Numeric channel ID (not username) |
+| `community_integrations_twitch_subscriber_group` | Discourse group name for subscribers (default: `Twitch Subscriber`) |
+| `community_integrations_github_sponsors_target_username` | GitHub username to check sponsorship of (default: `ChrisTitusTech`) |
+| `community_integrations_github_sponsors_group` | Discourse group for sponsors (default: `GitHub Sponsors`) |
+| `community_integrations_youtube_client_id` / `community_integrations_youtube_client_secret` | Google OAuth app credentials |
+| `community_integrations_youtube_channel_id` | Creator's YouTube channel ID |
+| `community_integrations_youtube_creator_refresh_token` | Creator token with `channel-memberships.creator` scope |
+| `community_integrations_youtube_member_group` | Discourse group for members (default: `YouTube Member`) |
 | `community_integrations_sync_interval_hours` | Re-sync interval in hours (1–24, default: 6) |
 
 ---
@@ -138,7 +138,7 @@ GitHub OAuth is standard Discourse — no custom settings needed. The plugin che
 1. <https://dev.twitch.tv/console> → **Register Your Application**
 2. **OAuth Redirect URL**: `https://YOUR_DOMAIN/auth/twitch/callback`
 3. Category: **Website Integration**
-4. Enter Client ID, Secret, and your numeric **Broadcaster ID** in **Admin → Settings → Plugins → Community Integrations**
+4. Enter Client ID, Secret, and your numeric **Broadcaster ID** in **Admin → Settings** (search `community_integrations_twitch`)
 
 Find your numeric broadcaster ID (it is *not* your username):
 - API: `https://api.twitch.tv/helix/users?login=YOUR_USERNAME` (requires a bearer token)
@@ -176,7 +176,7 @@ Paste the printed refresh token into plugin settings.
 **Step 3 — Configure in Discourse**
 
 - **Admin → Settings → Login → Google** — enter Client ID and Secret; enable `enable google oauth2 logins`
-- **Admin → Settings → Plugins → Community Integrations** — enter YouTube Client ID, Secret, Channel ID, Creator Refresh Token
+- **Admin → Settings** (search `community_integrations_youtube`) — enter YouTube Client ID, Secret, Channel ID, Creator Refresh Token
 
 ---
 
@@ -225,51 +225,3 @@ bash <(curl -fsSL https://raw.githubusercontent.com/ChrisTitusTech/community/mai
 ```
 
 This installs Docker, configures UFW (ports 22/80/443), adds a 2 GB swapfile, and clones `discourse_docker`. After it completes, copy `deploy/app.yml` to `/var/discourse/containers/app.yml`, fill in the `REPLACE_WITH_*` placeholders, then bootstrap.
-
----
-
-## Removing Caddy and Running Discourse Standalone
-
-If you previously had Caddy in front of Discourse and want to remove it:
-
-**1. Stop and disable Caddy**
-
-```bash
-sudo systemctl stop caddy
-sudo systemctl disable caddy
-```
-
-**2. Open ports 80 and 443 in UFW**
-
-Caddy was holding these ports. Release them:
-
-```bash
-sudo ufw allow 80/tcp
-sudo ufw allow 443/tcp
-```
-
-**3. Update `containers/app.yml`**
-
-Change the `expose` section to:
-
-```yaml
-expose:
-  - "80:80"
-  - "443:443"
-```
-
-The `deploy/app.yml` in this repo already defaults to this. `DISCOURSE_FORCE_HTTPS: true` remains correct and still needed — Discourse's own nginx uses it to issue valid `https://` OAuth callback URLs.
-
-**4. Rebuild**
-
-```bash
-cd /var/discourse
-./launcher rebuild app
-```
-
-Discourse's built-in nginx will obtain a Let's Encrypt certificate automatically on first boot, as long as:
-- Your domain's DNS A record points to this server's IP
-- Port 80 is reachable (Let's Encrypt HTTP-01 challenge)
-- `DISCOURSE_HOSTNAME` matches the domain exactly
-
----

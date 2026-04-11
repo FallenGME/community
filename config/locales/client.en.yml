@@ -1,0 +1,11 @@
+en:
+  js:
+    login:
+      twitch:
+        name: "Twitch"
+        title: "with Twitch"
+        message: "Authenticating with Twitch"
+      youtube:
+        name: "YouTube"
+        title: "Connect YouTube"
+        message: "Connecting your YouTube account"

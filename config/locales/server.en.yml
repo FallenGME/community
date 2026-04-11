@@ -3,39 +3,39 @@ en:
     community_integrations_enabled: "Enable community platform integrations"
 
     # ── Twitch ────────────────────────────────────────────────────────────────
-    twitch_client_id: "Twitch application Client ID"
-    twitch_client_secret: "Twitch application Client Secret"
-    twitch_broadcaster_id: >
+    community_integrations_twitch_client_id: "Twitch application Client ID"
+    community_integrations_twitch_client_secret: "Twitch application Client Secret"
+    community_integrations_twitch_broadcaster_id: >
       Twitch numeric broadcaster (channel) ID to check subscriptions against.
       This is a number, NOT a username. Find it at
       https://api.twitch.tv/helix/users?login=YOUR_USERNAME using any app token,
       or use https://www.streamweasels.com/tools/convert-twitch-username-to-user-id/
-    twitch_subscriber_group: "Discourse group name for active Twitch subscribers"
+    community_integrations_twitch_subscriber_group: "Discourse group name for active Twitch subscribers"
 
     # ── GitHub Sponsors ───────────────────────────────────────────────────────
-    github_sponsors_target_username: >
+    community_integrations_github_sponsors_target_username: >
       GitHub username whose sponsor list will be checked.
       Users who are actively sponsoring this account receive the GitHub Sponsors group.
-    github_sponsors_group: "Discourse group name for active GitHub Sponsors"
+    community_integrations_github_sponsors_group: "Discourse group name for active GitHub Sponsors"
 
     # ── YouTube Members ───────────────────────────────────────────────────────
-    youtube_client_id: >
+    community_integrations_youtube_client_id: >
       Google OAuth2 Client ID for the YouTube connect flow.
       This can be the same OAuth app as your main Google login,
       provided you have enabled the YouTube Data API v3 in GCP and added
       the youtube.readonly scope to the consent screen.
-    youtube_client_secret: "Google OAuth2 Client Secret for the YouTube connect flow"
-    youtube_channel_id: >
+    community_integrations_youtube_client_secret: "Google OAuth2 Client Secret for the YouTube connect flow"
+    community_integrations_youtube_channel_id: >
       Your YouTube channel ID (starts with UC…).
       Find it at https://www.youtube.com/account_advanced while signed in as
       the channel owner.
-    youtube_creator_refresh_token: >
+    community_integrations_youtube_creator_refresh_token: >
       Long-lived refresh token for the channel OWNER's Google account with
       youtube.channel-memberships.creator scope.
       Obtain this once with scripts/get_youtube_creator_token.py and paste here.
       This token is used server-side to query the member list; it is NEVER
       sent to end users.
-    youtube_member_group: "Discourse group name for active YouTube channel members"
+    community_integrations_youtube_member_group: "Discourse group name for active YouTube channel members"
 
     # ── Sync schedule ─────────────────────────────────────────────────────────
     community_integrations_sync_interval_hours: >

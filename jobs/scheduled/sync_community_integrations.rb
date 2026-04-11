@@ -34,8 +34,8 @@ class Jobs::SyncCommunityIntegrations < Jobs::Scheduled
   # ── Twitch ───────────────────────────────────────────────────────────────────
 
   def sync_twitch
-    return unless SiteSetting.twitch_client_id.present?
-    return unless SiteSetting.twitch_broadcaster_id.present?
+    return unless SiteSetting.community_integrations_twitch_client_id.present?
+    return unless SiteSetting.community_integrations_twitch_broadcaster_id.present?
 
     user_ids_with_account("twitch").each_slice(BATCH_SIZE) do |batch|
       User.where(id: batch).find_each do |user|
@@ -51,7 +51,7 @@ class Jobs::SyncCommunityIntegrations < Jobs::Scheduled
   # ── GitHub Sponsors ──────────────────────────────────────────────────────────
 
   def sync_github_sponsors
-    return unless SiteSetting.github_sponsors_target_username.present?
+    return unless SiteSetting.community_integrations_github_sponsors_target_username.present?
 
     user_ids_with_account("github").each_slice(BATCH_SIZE) do |batch|
       User.where(id: batch).find_each do |user|
@@ -67,8 +67,8 @@ class Jobs::SyncCommunityIntegrations < Jobs::Scheduled
   # ── YouTube Members ───────────────────────────────────────────────────────────
 
   def sync_youtube_members
-    return unless SiteSetting.youtube_channel_id.present?
-    return unless SiteSetting.youtube_creator_refresh_token.present?
+    return unless SiteSetting.community_integrations_youtube_channel_id.present?
+    return unless SiteSetting.community_integrations_youtube_creator_refresh_token.present?
 
     user_ids_with_account("youtube").each_slice(BATCH_SIZE) do |batch|
       User.where(id: batch).find_each do |user|

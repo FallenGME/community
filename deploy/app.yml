@@ -3,33 +3,36 @@
 ## Documentation: https://github.com/discourse/discourse_docker
 ## Template reference: https://github.com/discourse/discourse_docker/blob/main/samples/standalone.yml
 ##
-## BEFORE BOOTSTRAPPING:
-##   1. Replace all REPLACE_WITH_* values below
-##   2. Ensure your domain DNS A record points to this VPS
-##   3. Ensure ports 80 and 443 are open in UFW
+## ── Secrets management ───────────────────────────────────────────────────────
+## This file is committed to git.  Secrets are passed via shell environment
+## variables — the launcher substitutes $VAR references at build time.
 ##
-## Bootstrap:  ./launcher bootstrap app
+## Store secrets in /etc/discourse.env on the server (chmod 600, owned root):
+##
+##   DISCOURSE_HOSTNAME=forum.christitus.com
+##   DISCOURSE_DEVELOPER_EMAILS=contact@christitus.com
+##   DISCOURSE_SMTP_ADDRESS=email-smtp.us-east-1.amazonaws.com
+##   DISCOURSE_SMTP_PORT=2587
+##   DISCOURSE_SMTP_USER_NAME=AKIAxxxxxxxxxxxxxxxxx
+##   DISCOURSE_SMTP_PASSWORD=your+ses+smtp+password
+##   DISCOURSE_SMTP_DOMAIN=christitus.com
+##   DISCOURSE_NOTIFICATION_EMAIL=noreply@christitus.com
+##
+## Then rebuild with:
+##   source /etc/discourse.env && cd /var/discourse && ./launcher rebuild app
+##
+## Bootstrap:  source /etc/discourse.env && ./launcher bootstrap app
 ## Start:       ./launcher start app
-## Rebuild:     ./launcher rebuild app
+## Rebuild:     source /etc/discourse.env && ./launcher rebuild app
 
 templates:
   - "templates/postgres.template.yml"
   - "templates/redis.template.yml"
   - "templates/web.template.yml"
+  - "templates/web.letsencrypt.ssl.template.yml"
   - "templates/web.ratelimited.template.yml"
 
-## ── Expose ────────────────────────────────────────────────────────────────
-## Default: Discourse owns SSL directly (no reverse proxy).
-## Discourse's built-in nginx handles Let's Encrypt automatically.
-##
-## If you run Caddy or another reverse proxy on the same host:
-##   Comment out 80/443 below and expose "8080:80" instead.
-##   Add to your Caddyfile:
-##     reverse_proxy localhost:8080 {
-##       header_up X-Forwarded-Proto https
-##       header_up X-Real-IP {remote_host}
-##     }
-##
+## Expose HTTP and HTTPS to the host
 expose:
   - "80:80"
   - "443:443"
@@ -50,8 +53,8 @@ env:
   DISCOURSE_DEFAULT_LOCALE: en
 
   ## ── Domain ────────────────────────────────────────────────────────────────
-  ## The public hostname for your forum. Must match your DNS A record.
-  DISCOURSE_HOSTNAME: 'REPLACE_WITH_YOUR_DOMAIN'   # e.g. community.christitus.com
+  ## Set DISCOURSE_HOSTNAME in /etc/discourse.env on the server.
+  DISCOURSE_HOSTNAME: $DISCOURSE_HOSTNAME
 
   ## Force Discourse to generate https:// URLs in OAuth callbacks.
   ## Without this, OAuth providers see http:// redirect URIs and reject them
@@ -59,18 +62,20 @@ env:
   DISCOURSE_FORCE_HTTPS: true
 
   ## Email address that receives admin-level notifications (space-separated)
-  DISCOURSE_DEVELOPER_EMAILS: 'REPLACE_WITH_ADMIN_EMAIL'
+  ## Set DISCOURSE_DEVELOPER_EMAILS in /etc/discourse.env on the server.
+  DISCOURSE_DEVELOPER_EMAILS: $DISCOURSE_DEVELOPER_EMAILS
 
   ## ── Transactional Email (SMTP) ────────────────────────────────────────────
   ## Required for user signups, password resets, and notifications.
-  ## Mailgun example — replace with your provider's details.
-  DISCOURSE_SMTP_ADDRESS: smtp.mailgun.org
-  DISCOURSE_SMTP_PORT: 587
-  DISCOURSE_SMTP_USER_NAME: 'REPLACE_WITH_SMTP_USER'      # e.g. postmaster@mg.christitus.com
-  DISCOURSE_SMTP_PASSWORD: 'REPLACE_WITH_SMTP_PASSWORD'
+  ## Set all DISCOURSE_SMTP_* variables in /etc/discourse.env on the server.
+  DISCOURSE_SMTP_ADDRESS: $DISCOURSE_SMTP_ADDRESS
+  DISCOURSE_SMTP_PORT: $DISCOURSE_SMTP_PORT
+  DISCOURSE_SMTP_USER_NAME: $DISCOURSE_SMTP_USER_NAME
+  DISCOURSE_SMTP_PASSWORD: $DISCOURSE_SMTP_PASSWORD
   DISCOURSE_SMTP_ENABLE_START_TLS: true
-  DISCOURSE_SMTP_DOMAIN: 'REPLACE_WITH_MAIL_DOMAIN'       # e.g. christitus.com
-  DISCOURSE_NOTIFICATION_EMAIL: 'REPLACE_WITH_FROM_EMAIL' # e.g. noreply@christitus.com
+  DISCOURSE_SMTP_AUTHENTICATION: login
+  DISCOURSE_SMTP_DOMAIN: $DISCOURSE_SMTP_DOMAIN
+  DISCOURSE_NOTIFICATION_EMAIL: $DISCOURSE_NOTIFICATION_EMAIL
 
   ## ── Performance (tuned for 6 vCPU / 6 GB RAM) ────────────────────────────
   ## Unicorn workers handle HTTP requests; keep at (CPU count - 2) to leave

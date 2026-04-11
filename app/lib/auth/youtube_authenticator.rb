@@ -25,7 +25,7 @@ class Auth::YouTubeAuthenticator < Auth::ManagedAuthenticator
   end
 
   def enabled?
-    SiteSetting.community_integrations_enabled && SiteSetting.youtube_client_id.present?
+    SiteSetting.community_integrations_enabled && SiteSetting.community_integrations_youtube_client_id.present?
   end
 
   # Do NOT show this provider on the login modal — it only shows in
@@ -48,8 +48,8 @@ class Auth::YouTubeAuthenticator < Auth::ManagedAuthenticator
                       setup:
                         lambda { |env|
                           opts = env["omniauth.strategy"].options
-                          opts[:client_id] = SiteSetting.youtube_client_id
-                          opts[:client_secret] = SiteSetting.youtube_client_secret
+                          opts[:client_id] = SiteSetting.community_integrations_youtube_client_id
+                          opts[:client_secret] = SiteSetting.community_integrations_youtube_client_secret
                           # Request offline access so we receive a refresh token
                           # that can be used by the scheduled sync job.
                           opts[:access_type] = "offline"

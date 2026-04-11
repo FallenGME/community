@@ -34,7 +34,7 @@ module CommunityIntegrations
 
     def self.sync_user(user)
       return unless SiteSetting.community_integrations_enabled
-      return unless SiteSetting.github_sponsors_target_username.present?
+      return unless SiteSetting.community_integrations_github_sponsors_target_username.present?
 
       associated =
         UserAssociatedAccount.find_by(user_id: user.id, provider_name: "github")
@@ -48,7 +48,7 @@ module CommunityIntegrations
       end
 
       sponsoring = check_sponsoring(token)
-      GroupSync.sync(user, SiteSetting.github_sponsors_group, sponsoring)
+      GroupSync.sync(user, SiteSetting.community_integrations_github_sponsors_group, sponsoring)
     end
 
     # ── Private helpers ────────────────────────────────────────────────────────
@@ -63,7 +63,7 @@ module CommunityIntegrations
             {
               query: SPONSORING_QUERY,
               variables: {
-                login: SiteSetting.github_sponsors_target_username,
+                login: SiteSetting.community_integrations_github_sponsors_target_username,
               },
             }.to_json
         end

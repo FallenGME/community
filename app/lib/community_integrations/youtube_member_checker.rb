@@ -39,8 +39,8 @@ module CommunityIntegrations
 
     def self.sync_user(user)
       return unless SiteSetting.community_integrations_enabled
-      return unless SiteSetting.youtube_channel_id.present?
-      return unless SiteSetting.youtube_creator_refresh_token.present?
+      return unless SiteSetting.community_integrations_youtube_channel_id.present?
+      return unless SiteSetting.community_integrations_youtube_creator_refresh_token.present?
 
       associated =
         UserAssociatedAccount.find_by(user_id: user.id, provider_name: "youtube")
@@ -74,7 +74,7 @@ module CommunityIntegrations
       end
 
       member = check_membership(creator_token, user_channel_id)
-      GroupSync.sync(user, SiteSetting.youtube_member_group, member)
+      GroupSync.sync(user, SiteSetting.community_integrations_youtube_member_group, member)
     end
 
     # ── Private helpers ────────────────────────────────────────────────────────
@@ -120,7 +120,7 @@ module CommunityIntegrations
       case response.status
       when 200
         data = JSON.parse(response.body)
-        target = SiteSetting.youtube_channel_id
+        target = SiteSetting.community_integrations_youtube_channel_id
         data["items"]&.any? { |item| item.dig("snippet", "creatorChannelId") == target } || false
       when 403
         Rails.logger.error(
@@ -149,7 +149,7 @@ module CommunityIntegrations
       cached = Discourse.cache.read(CREATOR_TOKEN_CACHE)
       return cached if cached.present?
 
-      refresh_token = SiteSetting.youtube_creator_refresh_token
+      refresh_token = SiteSetting.community_integrations_youtube_creator_refresh_token
       return nil unless refresh_token.present?
 
       response =
@@ -159,8 +159,8 @@ module CommunityIntegrations
             URI.encode_www_form(
               grant_type: "refresh_token",
               refresh_token: refresh_token,
-              client_id: SiteSetting.youtube_client_id,
-              client_secret: SiteSetting.youtube_client_secret,
+              client_id: SiteSetting.community_integrations_youtube_client_id,
+              client_secret: SiteSetting.community_integrations_youtube_client_secret,
             )
         end
 
@@ -202,8 +202,8 @@ module CommunityIntegrations
             URI.encode_www_form(
               grant_type: "refresh_token",
               refresh_token: refresh_token,
-              client_id: SiteSetting.youtube_client_id,
-              client_secret: SiteSetting.youtube_client_secret,
+              client_id: SiteSetting.community_integrations_youtube_client_id,
+              client_secret: SiteSetting.community_integrations_youtube_client_secret,
             )
         end
 
