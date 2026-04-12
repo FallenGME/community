@@ -1,10 +1,13 @@
 import Component from "@glimmer/component";
+import { service } from "@ember/service";
 import categoryLink from "discourse/helpers/category-link";
 import Category from "discourse/models/category";
 
 export default class CttCategoryList extends Component {
+  @service siteSettings;
+
   get categories() {
-    const ids = siteSettings.community_integrations_sidebar_category_ids;
+    const ids = this.siteSettings.community_integrations_sidebar_category_ids;
     if (ids && ids.trim() !== "") {
       return ids
         .split(",")

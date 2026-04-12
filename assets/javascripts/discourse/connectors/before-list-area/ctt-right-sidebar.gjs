@@ -6,12 +6,13 @@ import CttCategoryList from "../../components/ctt-category-list";
 export default class CttRightSidebar extends Component {
   @service router;
   @service site;
+  @service siteSettings;
 
-  // Resolve the gamification leaderboard component once at construction.
-  // Returns null when discourse-gamification is not installed, so the
-  // {{#if this.leaderboardComponent}} guard below skips it cleanly.
-  leaderboardComponent = (() => {
-    if (!siteSettings.community_integrations_gamification_leaderboard_id) {
+  // Resolve the gamification leaderboard component at render time.
+  // Returns null when discourse-gamification is not installed or leaderboard
+  // ID is 0, so the {{#if}} guard below skips it cleanly.
+  get leaderboardComponent() {
+    if (!this.siteSettings.community_integrations_gamification_leaderboard_id) {
       return null;
     }
     return (
@@ -19,7 +20,11 @@ export default class CttRightSidebar extends Component {
         "component:minimal-gamification-leaderboard"
       ) ?? null
     );
-  })();
+  }
+
+  get leaderboardId() {
+    return this.siteSettings.community_integrations_gamification_leaderboard_id;
+  }
 
   get showSidebar() {
     if (this.site.mobileView) {
@@ -34,9 +39,7 @@ export default class CttRightSidebar extends Component {
       <div class="tc-right-sidebar">
         {{#if this.leaderboardComponent}}
           <div class="rs-component rs-minimal-gamification-leaderboard">
-            <this.leaderboardComponent
-              @id={{siteSettings.community_integrations_gamification_leaderboard_id}}
-            />
+            <this.leaderboardComponent @id={{this.leaderboardId}} />
           </div>
         {{/if}}
         <div class="rs-component rs-ctt-category-list">
