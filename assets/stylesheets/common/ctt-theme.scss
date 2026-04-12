@@ -738,6 +738,102 @@ footer,
 .cooked .shadow {
   box-shadow: var(--ctt-shadow) !important;
 }
+
+// ── Gamification leaderboard — sidebar size overrides ────────────────────────
+// The minimal leaderboard is designed for full-width pages; this trims it
+// down to fit cleanly in a 25% sidebar column matching the CTT theme.
+
+.tc-right-sidebar .leaderboard.-minimal {
+  // Title link
+  .page__header {
+    padding-bottom: 0.4em;
+    margin-bottom: 0.25em;
+    border-bottom: 1px solid var(--ctt-border);
+  }
+
+  .page__title {
+    font-family: 'PT Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ctt-text-muted);
+    margin: 0;
+
+    a {
+      color: var(--ctt-text-muted);
+      &:hover { color: var(--ctt-accent); text-decoration: none; }
+    }
+  }
+
+  // Column header row
+  .ranking-col-names {
+    padding: 0.25em 0.25em;
+    font-size: 12px;
+    color: var(--ctt-text-muted);
+    background-color: transparent;
+    border-bottom: 1px solid var(--ctt-border);
+  }
+
+  // Each user row
+  .user {
+    padding: 0.35em 0.25em;
+    border-bottom: 1px solid var(--ctt-border);
+
+    // Rank number / crown icon
+    &__rank {
+      font-size: var(--font-0);
+      min-width: 1.5em;
+      text-align: center;
+
+      .d-icon-crown {
+        font-size: var(--font-up-1);
+        color: #ffd82a;
+      }
+    }
+
+    // Avatar + name column
+    &__avatar {
+      flex: 1;
+      overflow: hidden;
+
+      img {
+        width: 24px;
+        height: 24px;
+        margin-right: 0.3em;
+        vertical-align: middle;
+      }
+    }
+
+    &__name {
+      font-size: 13px;
+      color: var(--ctt-text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100px;
+    }
+
+    // Score column
+    &__score {
+      font-size: var(--font-0);
+      font-weight: 600;
+      color: var(--ctt-text);
+    }
+
+    // Highlighted row (current user)
+    &-highlight {
+      background-color: var(--ctt-accent-tint);
+      border-radius: var(--ctt-radius);
+
+      .user__name,
+      .user__score,
+      .user__rank {
+        color: var(--ctt-accent);
+      }
+    }
+  }
+}
 // ── Reduced motion (WCAG 2.3.3 / prefers-reduced-motion) ──────────────────────
 // Disables all CSS transitions and animations for users who have requested
 // reduced motion at the OS level.
