@@ -47,18 +47,24 @@ after_initialize do
     next unless result.user
     next unless SiteSetting.community_integrations_enabled
 
-    case authenticator.name
-    when "github"
-      Jobs.enqueue(:check_github_sponsor, user_id: result.user.id)
-    when "google_oauth2"
-      # Standard Google login — no YouTube scope on this token; skip YouTube check.
-      # YouTube membership is checked after the dedicated YouTube connect flow
-      # handled by Auth::YouTubeAuthenticator (provider name: "youtube").
-      nil
-    when "youtube"
-      Jobs.enqueue(:check_youtube_member, user_id: result.user.id)
-    when "twitch"
-      Jobs.enqueue(:check_twitch_subscriber, user_id: result.user.id)
+    begin
+      case authenticator.name
+      when "github"
+        Jobs.enqueue(:check_github_sponsor, user_id: result.user.id)
+      when "google_oauth2"
+        # Standard Google login — no YouTube scope on this token; skip YouTube check.
+        # YouTube membership is checked after the dedicated YouTube connect flow
+        # handled by Auth::YouTubeAuthenticator (provider name: "youtube").
+        nil
+      when "youtube"
+        Jobs.enqueue(:check_youtube_member, user_id: result.user.id)
+      when "twitch"
+        Jobs.enqueue(:check_twitch_subscriber, user_id: result.user.id)
+      end
+    rescue => e
+      Rails.logger.error(
+        "CommunityIntegrations after_auth failed for #{authenticator.name}: #{e.class}: #{e.message}",
+      )
     end
   end
 end
