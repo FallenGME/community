@@ -105,3 +105,11 @@
     padding: 20px 30px;
   }
 }
+
+// ── Reduced motion ────────────────────────────────────────────────────────────
+
+@media (prefers-reduced-motion: reduce) {
+  .topic-list-body .topic-list-item {
+    transition: none;
+  }
+}
