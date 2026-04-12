@@ -6,18 +6,20 @@ Wants=network-online.target
 
 [Service]
 Type=simple
-User=discourse
-Group=discourse
+# Set this to the non-root user that owns the plugin files on the *host*.
+# The 'discourse' user only exists inside the Docker container — it does NOT
+# exist on the host OS. Run: id -un   to find your current host username.
+# Example: User=ubuntu  or  User=admin  or  User=deploy
+# If you are unsure, run the bot as root by removing these two lines entirely.
+User=root
+# Group=  # uncomment and set if running as a non-root user
 
-# Adjust WorkingDirectory to wherever you've placed the plugin on the VPS.
-# If the plugin is mounted into the Discourse container, the scripts directory
-# is accessible on the host at the path below (adjust if your setup differs).
-WorkingDirectory=/var/discourse/plugins/community/scripts/discord_bot
+WorkingDirectory=/var/discourse/community/scripts/discord_bot
 
 # Load secrets from the .env file — never commit this file to version control.
-EnvironmentFile=/var/discourse/plugins/community/scripts/discord_bot/.env
+EnvironmentFile=/var/discourse/community/scripts/discord_bot/.env
 
-ExecStart=/usr/bin/python3 bot.py
+ExecStart=/var/discourse/community/scripts/discord_bot/venv/bin/python3 bot.py
 
 # Restart the bot if it crashes; wait 5 s between attempts.
 Restart=on-failure

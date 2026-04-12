@@ -2,7 +2,7 @@
 # discord_debug.sh — Preflight & troubleshooting script for the Discord ↔ Discourse bridge.
 #
 # Run as root or with sudo on the VPS:
-#   bash /var/discourse/plugins/community/scripts/discord_debug.sh
+#   bash /var/discourse/community/scripts/discord_debug.sh
 #
 # What it checks:
 #   1.  Bot service (systemd) — installed, enabled, running
@@ -39,7 +39,7 @@ WARNINGS=0
 
 # ── Configuration ─────────────────────────────────────────────────────────────
 # Adjust these paths if your deployment differs from the defaults in discord-bot.service
-BOT_DIR="${BOT_DIR:-/var/discourse/plugins/community/scripts/discord_bot}"
+BOT_DIR="${BOT_DIR:-/var/discourse/community/scripts/discord_bot}"
 SERVICE_NAME="${SERVICE_NAME:-discord-bot}"
 DISCOURSE_URL="${DISCOURSE_URL:-https://forum.christitus.com}"
 DISCOURSE_API_KEY="${DISCOURSE_API_KEY:-}"   # optional — needed for check 13
