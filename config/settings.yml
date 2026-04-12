@@ -64,6 +64,49 @@ plugins:
     max: 24
     client: false
 
+  # ── Discord Bridge ────────────────────────────────────────────────────────────
+  community_integrations_discord_bot_token:
+    default: ""
+    type: string
+    secret: true
+
+  community_integrations_discord_general_webhook_url:
+    default: ""
+    type: string
+    secret: true
+
+  community_integrations_discord_incoming_secret:
+    default: ""
+    type: string
+    secret: true
+
+  community_integrations_discord_general_channel_id:
+    default: ""
+    type: string
+    client: false
+
+  community_integrations_discord_support_forum_id:
+    default: ""
+    type: string
+    client: false
+
+  community_integrations_discourse_chat_channel_id:
+    default: 0
+    type: integer
+    min: 0
+    client: false
+
+  community_integrations_discourse_support_category_id:
+    default: 0
+    type: integer
+    min: 0
+    client: false
+
+  community_integrations_discord_bridge_username:
+    default: "discord-bridge"
+    type: string
+    client: false
+
   # ── Right sidebar ────────────────────────────────────────────────────────────
   community_integrations_gamification_leaderboard_id:
     default: 1

@@ -32,6 +32,35 @@ en:
       group membership accurate.
     community_integrations_youtube_member_group: "Discourse group name for active YouTube channel members"
 
+    # ── Discord Bridge ────────────────────────────────────────────────────────
+    community_integrations_discord_bot_token: >-
+      Discord bot token for the bridge bot. Used to post messages into Discord
+      Forum channel threads and to read Forum channel metadata.
+      Create a bot at https://discord.com/developers/applications.
+    community_integrations_discord_general_webhook_url: >-
+      Discord Incoming Webhook URL for the General/chat channel.
+      Messages posted in Discourse Chat will be relayed here.
+      Create one via Discord channel settings → Integrations → Webhooks.
+    community_integrations_discord_incoming_secret: >-
+      Shared HMAC-SHA256 secret used to authenticate requests from the Discord
+      bridge bot to Discourse. Generate a long random string and use the same
+      value in the bot's .env file.
+    community_integrations_discord_general_channel_id: >-
+      Discord channel ID of the General/chat channel to bridge.
+      Right-click the channel in Discord (Developer Mode must be on) → Copy ID.
+    community_integrations_discord_support_forum_id: >-
+      Discord channel ID of the Forum channel used for support posts.
+      Right-click the Forum channel → Copy ID.
+    community_integrations_discourse_chat_channel_id: >-
+      Discourse Chat channel ID to bridge with Discord General.
+      Find it in Admin → Chat Channels (shown in the URL).
+    community_integrations_discourse_support_category_id: >-
+      Discourse category ID to bridge with the Discord support Forum channel.
+      Find it in Admin → Categories (shown in the URL).
+    community_integrations_discord_bridge_username: >-
+      Discourse username used to post mirrored Discord messages when no
+      matching Discourse account is found. This user must exist.
+
     # ── Right sidebar ────────────────────────────────────────────────────────
     community_integrations_gamification_leaderboard_id: >-
       Gamification leaderboard ID to display in the right sidebar.

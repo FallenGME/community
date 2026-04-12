@@ -1,0 +1,3 @@
+# Ignore the live .env file — it contains secrets.
+# Commit only .env.example (no real credentials).
+scripts/discord_bot/.env

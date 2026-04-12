@@ -1,0 +1,35 @@
+[Unit]
+Description=Discord-Discourse Bridge Bot
+Documentation=https://github.com/ChrisTitusTech/community
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=discourse
+Group=discourse
+
+# Adjust WorkingDirectory to wherever you've placed the plugin on the VPS.
+# If the plugin is mounted into the Discourse container, the scripts directory
+# is accessible on the host at the path below (adjust if your setup differs).
+WorkingDirectory=/var/discourse/plugins/community/scripts/discord_bot
+
+# Load secrets from the .env file — never commit this file to version control.
+EnvironmentFile=/var/discourse/plugins/community/scripts/discord_bot/.env
+
+ExecStart=/usr/bin/python3 bot.py
+
+# Restart the bot if it crashes; wait 5 s between attempts.
+Restart=on-failure
+RestartSec=5
+
+# Give Python 10 s to shut down gracefully before SIGKILL.
+TimeoutStopSec=10
+
+# Send stdout/stderr to the systemd journal (view with: journalctl -u discord-bot -f)
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=discord-bridge-bot
+
+[Install]
+WantedBy=multi-user.target

@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 # name: discourse-community-integrations
-# about: Syncs GitHub Sponsors, Twitch Subscribers, and YouTube Members to Discourse groups
-# version: 0.1.0
+# about: Syncs GitHub Sponsors, Twitch Subscribers, and YouTube Members to Discourse groups; bridges Discord ↔ Discourse Chat and Support Forum
+# version: 0.2.0
 # authors: ChrisTitusTech
 # url: https://github.com/ChrisTitusTech/discourse-community-integrations
 
@@ -35,11 +35,71 @@ require_relative "app/lib/community_integrations/twitch_checker"
 require_relative "app/lib/community_integrations/github_sponsors_checker"
 require_relative "app/lib/community_integrations/youtube_member_checker"
 
+# ── Load Discord bridge ────────────────────────────────────────────────────────
+require_relative "app/lib/community_integrations/discord_bridge"
+require_relative "app/controllers/community_integrations/discord_incoming_controller"
+
 # ── Register OAuth providers ───────────────────────────────────────────────────
 auth_provider authenticator: Auth::TwitchAuthenticator.new
 auth_provider authenticator: Auth::YouTubeAuthenticator.new
 
 after_initialize do
+  # ── Discord bridge: incoming HTTP route ─────────────────────────────────────
+  Discourse::Application.routes.append do
+    post "/community-integrations/discord/incoming" =>
+           "community_integrations/discord_incoming#receive"
+  end
+
+  # ── Discord bridge: register custom fields ──────────────────────────────────
+  # Chat::Message custom fields (requires chat plugin to be loaded)
+  if defined?(Chat::Message)
+    Chat::Message.register_custom_field_type("discord_bridge_id", :string)
+  end
+
+  Topic.register_custom_field_type("discord_bridge_id", :string)
+  Post.register_custom_field_type("discord_bridge_id", :string)
+
+  # ── Discord bridge: Discourse Chat → Discord General ────────────────────────
+  on(:chat_message_created) do |message, channel, _user, _extra|
+    next unless SiteSetting.community_integrations_enabled
+    next if message.custom_fields["discord_bridge_id"].present?
+
+    expected_channel_id = SiteSetting.community_integrations_discourse_chat_channel_id
+    next if expected_channel_id.zero? || channel.id != expected_channel_id
+
+    Jobs.enqueue(:discord_outgoing_chat, message_id: message.id)
+  rescue => e
+    Rails.logger.error("DiscordBridge chat_message_created hook error: #{e.class}: #{e.message}")
+  end
+
+  # ── Discord bridge: Discourse Support Topic → Discord Forum thread ───────────
+  on(:topic_created) do |topic, _opts, _user|
+    next unless SiteSetting.community_integrations_enabled
+    next if topic.custom_fields["discord_bridge_id"].present?
+
+    expected_category_id = SiteSetting.community_integrations_discourse_support_category_id
+    next if expected_category_id.zero? || topic.category_id != expected_category_id
+
+    # first_post may not be committed yet; enqueue and let the job load it
+    Jobs.enqueue(:discord_outgoing_forum, post_id: topic.first_post&.id || 0, is_new_thread: true)
+  rescue => e
+    Rails.logger.error("DiscordBridge topic_created hook error: #{e.class}: #{e.message}")
+  end
+
+  # ── Discord bridge: Discourse Support Reply → Discord Forum thread reply ─────
+  on(:post_created) do |post, _opts, _user|
+    next unless SiteSetting.community_integrations_enabled
+    next if post.custom_fields["discord_bridge_id"].present?
+    next if post.is_first_post?
+
+    expected_category_id = SiteSetting.community_integrations_discourse_support_category_id
+    next if expected_category_id.zero? || post.topic&.category_id != expected_category_id
+
+    Jobs.enqueue(:discord_outgoing_forum, post_id: post.id, is_new_thread: false)
+  rescue => e
+    Rails.logger.error("DiscordBridge post_created hook error: #{e.class}: #{e.message}")
+  end
+
   # ── GitHub Sponsors check on GitHub login ───────────────────────────────────
   # Runs asynchronously after every successful GitHub OAuth so the login
   # response time is unaffected by the GraphQL API call.
