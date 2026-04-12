@@ -62,7 +62,7 @@ plugins:
 
   # ── Right sidebar ────────────────────────────────────────────────────────────
   community_integrations_gamification_leaderboard_id:
-    default: 0
+    default: 1
     type: integer
     min: 0
     client: true
