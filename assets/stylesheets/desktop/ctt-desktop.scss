@@ -21,6 +21,15 @@
   border-right: 1px solid var(--ctt-border);
 }
 
+// ── Right Sidebar Blocks — float clearfix ─────────────────────────────────────
+// discourse-right-sidebar-blocks uses float: right / float: left layout.
+// Without clearing, floated children collapse the parent .wrap containers,
+// causing the page to visually repeat. display: flow-root creates a new block
+// formatting context that expands to contain its floated children.
+.wrap:has(.tc-right-sidebar) {
+  display: flow-root;
+}
+
 // ── Topic list desktop card layout ───────────────────────────────────────────
 
 .topic-list-body .topic-list-item {
