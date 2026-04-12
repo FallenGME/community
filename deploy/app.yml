@@ -150,3 +150,17 @@ hooks:
           ## Optional:
           ##   discourse-ai            → Admin → Settings → Plugins → Discourse AI
           ##   discourse-cakeday       → Admin → Settings → Plugins → Cakeday
+
+  after_redis:
+    - exec:
+        cmd:
+          ## ── Disable Redis RDB persistence ─────────────────────────────────
+          ## Discourse uses Redis as a pure cache — RDB background saves are
+          ## unnecessary and cause Redis to crash on fork() when the kernel
+          ## disallows memory overcommit (the default in many Docker hosts).
+          ## Disabling saves eliminates the crash entirely with no data loss.
+          - redis-cli CONFIG SET save ""
+          - redis-cli CONFIG SET stop-writes-on-bgsave-error no
+          - sed -i '/^save /d' /etc/redis/redis.conf
+          - grep -qxF 'save ""' /etc/redis/redis.conf || echo 'save ""' >> /etc/redis/redis.conf
+          - grep -qxF 'stop-writes-on-bgsave-error no' /etc/redis/redis.conf || echo 'stop-writes-on-bgsave-error no' >> /etc/redis/redis.conf
