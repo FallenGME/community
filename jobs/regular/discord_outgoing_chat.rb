@@ -14,7 +14,7 @@ module Jobs
       message_id = args[:message_id].to_i
       return if message_id.zero?
 
-      message = Chat::Message.find_by(id: message_id)
+      message = ::Chat::Message.find_by(id: message_id)
       return unless message
 
       # Extra guard: drop if this message was itself bridged in from Discord
