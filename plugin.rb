@@ -36,9 +36,9 @@ require_relative "app/lib/community_integrations/github_sponsors_checker"
 require_relative "app/lib/community_integrations/youtube_member_checker"
 
 # ── Load Discord bridge ────────────────────────────────────────────────────────
-# NOTE: Only lib files are require_relative'd here. Controllers live under app/
-# and are auto-loaded by Rails — explicitly requiring them at boot causes a
-# NameError because ApplicationController isn't defined yet at that stage.
+# Discourse does NOT add plugin app/controllers/ to Rails autoload paths, so the
+# controller must be explicitly required. Done inside after_initialize (below)
+# rather than here because ApplicationController is not yet defined at this stage.
 require_relative "app/lib/community_integrations/discord_bridge"
 
 # ── Register OAuth providers ───────────────────────────────────────────────────
@@ -46,6 +46,9 @@ auth_provider authenticator: Auth::TwitchAuthenticator.new
 auth_provider authenticator: Auth::YouTubeAuthenticator.new
 
 after_initialize do
+  # ── Discord bridge: load controller (Discourse does not autoload plugin app/ dirs)
+  require_relative "app/controllers/community_integrations/discord_incoming_controller"
+
   # ── Discord bridge: incoming HTTP route ───────────────────────────────────────
   Discourse::Application.routes.append do
     post "/community-integrations/discord/incoming" =>
