@@ -45,13 +45,14 @@ require_relative "app/lib/community_integrations/discord_bridge"
 auth_provider authenticator: Auth::TwitchAuthenticator.new
 auth_provider authenticator: Auth::YouTubeAuthenticator.new
 
-after_initialize do
-  # ── Discord bridge: incoming HTTP route ─────────────────────────────────────
-  Discourse::Application.routes.append do
-    post "/community-integrations/discord/incoming" =>
-           "community_integrations/discord_incoming#receive"
-  end
+# ── Discord bridge: incoming HTTP route ───────────────────────────────────────
+# Must be outside after_initialize — routes are frozen before that hook runs.
+Discourse::Application.routes.append do
+  post "/community-integrations/discord/incoming" =>
+         "community_integrations/discord_incoming#receive"
+end
 
+after_initialize do
   # ── Discord bridge: register custom fields ──────────────────────────────────
   # Chat::Message custom fields (requires chat plugin to be loaded)
   if defined?(Chat::Message)
