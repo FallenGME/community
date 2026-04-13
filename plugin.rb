@@ -46,8 +46,14 @@ auth_provider authenticator: Auth::TwitchAuthenticator.new
 auth_provider authenticator: Auth::YouTubeAuthenticator.new
 
 after_initialize do
-  # ── Discord bridge: load controller (Discourse does not autoload plugin app/ dirs)
+  # ── Load classes (Discourse does not autoload plugin subdirectories) ────────
   require_relative "app/controllers/community_integrations/discord_incoming_controller"
+  require_relative "jobs/regular/discord_outgoing_chat"
+  require_relative "jobs/regular/discord_outgoing_forum"
+  require_relative "jobs/regular/check_github_sponsor"
+  require_relative "jobs/regular/check_twitch_subscriber"
+  require_relative "jobs/regular/check_youtube_member"
+  require_relative "jobs/scheduled/sync_community_integrations"
 
   # ── Discord bridge: incoming HTTP route ───────────────────────────────────────
   Discourse::Application.routes.append do
