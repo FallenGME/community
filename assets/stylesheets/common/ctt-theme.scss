@@ -28,7 +28,7 @@
   --ctt-accent:        #47c4f1;
   // Text on accent-colored backgrounds (e.g. active buttons, badges)
   // #212529 on #47c4f1 = 6.3:1 (AA ✓)
-  --ctt-accent-text:   #212529!important;
+  --ctt-accent-text:   #212529;
   // Slightly darker shade used for button :hover/:focus states
   --ctt-accent-hover:  #2fb8ef;
   // Translucent accent used for hover/active tinted backgrounds
@@ -55,7 +55,7 @@
     // Softer accent to reduce visual intensity in light mode
     --ctt-accent:        #1b7fa3;
     // Dark text on accent keeps buttons readable without glowing white text
-    --ctt-accent-text:   #111827!important;
+    --ctt-accent-text:   #111827;
     --ctt-accent-hover:  #176a88;
     --ctt-accent-tint:   rgba(27, 127, 163, 0.09);
     --ctt-page-bg:       #eef1f4;
@@ -249,47 +249,22 @@ body,
       text-decoration: none;
     }
   }
+}
 
-  .ctt-header-nav__link--primary {
-    border-color: var(--ctt-accent);
-    background: var(--ctt-accent);
+.d-header .title .ctt-header-nav__link--primary {
+  border-color: var(--ctt-accent);
+  background: var(--ctt-accent);
+  color: var(--ctt-accent-text);
+
+  &:hover,
+  &:focus-visible {
+    border-color: var(--ctt-accent-hover);
+    background: var(--ctt-accent-hover);
     color: var(--ctt-accent-text);
-
-    &:hover,
-    &:focus-visible {
-      border-color: var(--ctt-accent-hover);
-      background: var(--ctt-accent-hover);
-      color: var(--ctt-accent-text);
-    }
   }
 }
 
-// ── Navigation / tabs ─────────────────────────────────────────────────────────
-
-.nav-pills > li > a,
-.nav-pills > li > button,
-.list-controls .combo-box .combo-box-header {
-  color: var(--ctt-text);
-  border-radius: var(--ctt-radius);
-  &:hover { color: var(--ctt-accent); }
-}
-
-.nav-pills > li.active > a,
-.nav-pills > li.active > button {
-  color: var(--ctt-accent-text);
-  background-color: var(--ctt-accent);
-  border-color: var(--ctt-accent);
-}
-
-// Active nav item underline — mirrors .nav-link active state on christitus.com
-.nav-pills > li > a.active,
-.nav-pills > li > a:focus {
-  color: var(--ctt-accent);
-  background: transparent;
-  border-bottom: 2px solid var(--ctt-accent);
-}
-
-// Category / tag dropdown — all states themed for dark and light modes.
+// ── Category / tag dropdown — all states themed for dark and light modes.
 // Base row state is set explicitly to prevent Discourse's default transparent
 // fallback leaking a light background that makes text unreadable in dark mode.
 .select-kit {
