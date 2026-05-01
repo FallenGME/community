@@ -18,31 +18,17 @@
   }
 }
 
-// ── Top nav bar on mobile ────────────────────────────────────────────────────
+// ── Header nav on mobile ─────────────────────────────────────────────────────
 
-.ctt-top-navbar {
-  .ctt-top-navbar__inner {
-    min-height: 40px;
-    gap: 0.5rem;
-  }
+.ctt-header-nav {
+  justify-content: center;
+  flex: 1 1 auto;
+  margin-left: 0;
 
-  .ctt-top-navbar__brand {
-    font-size: 12px;
-    letter-spacing: 0.02em;
-  }
-
-  .ctt-top-navbar__links {
-    gap: 0.25rem;
-  }
-
-  .ctt-top-navbar__link {
+  .ctt-header-nav__link {
     min-height: 28px;
-    padding: 0.12rem 0.5rem;
+    padding: 0.1rem 0.45rem;
     font-size: 12px;
-  }
-
-  .ctt-top-navbar__link--desktop-only {
-    display: none;
   }
 }
 

@@ -163,6 +163,14 @@ body,
   border-bottom: 1px solid var(--ctt-border);
   box-shadow: var(--ctt-shadow);
 
+  .title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
   .d-header-icons .icon,
   .d-header-icons .icon svg {
     color: var(--ctt-text);
@@ -185,50 +193,22 @@ body,
   }
 }
 
-// ── Chris Titus Tech top navigation bar ──────────────────────────────────────
+// ── Header nav links (single-bar layout) ────────────────────────────────────
 
-.ctt-top-navbar {
-  background: linear-gradient(90deg, var(--ctt-card-bg) 0%, var(--ctt-input-bg) 100%);
-  border-bottom: 1px solid var(--ctt-border);
+.ctt-header-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1 1 auto;
+  margin-left: 0;
+  white-space: nowrap;
 
-  .ctt-top-navbar__inner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    min-height: 44px;
-  }
-
-  .ctt-top-navbar__brand {
-    color: var(--ctt-text-dark);
-    font-family: 'PT Sans', sans-serif;
-    font-weight: 700;
-    font-size: 14px;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    text-decoration: none;
-
-    &:hover,
-    &:focus-visible {
-      color: var(--ctt-accent);
-      text-decoration: none;
-    }
-  }
-
-  .ctt-top-navbar__links {
-    display: flex;
-    align-items: center;
-    gap: 0.35rem;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-  }
-
-  .ctt-top-navbar__link {
+  .ctt-header-nav__link {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     min-height: 30px;
-    padding: 0.15rem 0.65rem;
+    padding: 0.15rem 0.6rem;
     border: 1px solid transparent;
     border-radius: var(--ctt-radius);
     color: var(--ctt-text);
@@ -246,7 +226,7 @@ body,
     }
   }
 
-  .ctt-top-navbar__link--primary {
+  .ctt-header-nav__link--primary {
     border-color: var(--ctt-accent);
     background: var(--ctt-accent);
     color: var(--ctt-accent-text);
