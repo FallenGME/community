@@ -18,6 +18,34 @@
   }
 }
 
+// ── Top nav bar on mobile ────────────────────────────────────────────────────
+
+.ctt-top-navbar {
+  .ctt-top-navbar__inner {
+    min-height: 40px;
+    gap: 0.5rem;
+  }
+
+  .ctt-top-navbar__brand {
+    font-size: 12px;
+    letter-spacing: 0.02em;
+  }
+
+  .ctt-top-navbar__links {
+    gap: 0.25rem;
+  }
+
+  .ctt-top-navbar__link {
+    min-height: 28px;
+    padding: 0.12rem 0.5rem;
+    font-size: 12px;
+  }
+
+  .ctt-top-navbar__link--desktop-only {
+    display: none;
+  }
+}
+
 // ── Topic list items ──────────────────────────────────────────────────────────
 
 .topic-list-body .topic-list-item {

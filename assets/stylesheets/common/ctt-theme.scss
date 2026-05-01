@@ -185,6 +185,81 @@ body,
   }
 }
 
+// ── Chris Titus Tech top navigation bar ──────────────────────────────────────
+
+.ctt-top-navbar {
+  background: linear-gradient(90deg, var(--ctt-card-bg) 0%, var(--ctt-input-bg) 100%);
+  border-bottom: 1px solid var(--ctt-border);
+
+  .ctt-top-navbar__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 44px;
+  }
+
+  .ctt-top-navbar__brand {
+    color: var(--ctt-text-dark);
+    font-family: 'PT Sans', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-decoration: none;
+
+    &:hover,
+    &:focus-visible {
+      color: var(--ctt-accent);
+      text-decoration: none;
+    }
+  }
+
+  .ctt-top-navbar__links {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .ctt-top-navbar__link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 30px;
+    padding: 0.15rem 0.65rem;
+    border: 1px solid transparent;
+    border-radius: var(--ctt-radius);
+    color: var(--ctt-text);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1;
+    text-decoration: none;
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+
+    &:hover,
+    &:focus-visible {
+      color: var(--ctt-accent);
+      border-color: var(--ctt-accent);
+      text-decoration: none;
+    }
+  }
+
+  .ctt-top-navbar__link--primary {
+    border-color: var(--ctt-accent);
+    background: var(--ctt-accent);
+    color: var(--ctt-accent-text);
+
+    &:hover,
+    &:focus-visible {
+      border-color: var(--ctt-accent-hover);
+      background: var(--ctt-accent-hover);
+      color: var(--ctt-accent-text);
+    }
+  }
+}
+
 // ── Navigation / tabs ─────────────────────────────────────────────────────────
 
 .nav-pills > li > a,
